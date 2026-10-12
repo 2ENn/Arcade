@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#101820">
+<title>Taoob Arcade</title>
+<meta name="description" content="รวมเกม A-Math, Sudoku และเกม 24 พร้อมบัญชีผู้เล่นและตารางอันดับ">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23101820'/%3E%3Crect x='10' y='10' width='20' height='20' rx='4' fill='%232f9e6a'/%3E%3Crect x='34' y='10' width='20' height='20' rx='4' fill='%2317708f'/%3E%3Crect x='10' y='34' width='20' height='20' rx='4' fill='%23ffcf5a'/%3E%3Crect x='34' y='34' width='20' height='20' rx='4' fill='%23f3eee1'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Sarabun:wght@400;500;700&display=swap">
+<style>
+/* Layout: หัวเว็บ + บัญชี → การ์ดเกม 3 ใบ → ตารางอันดับแบบแท็บ; แต่ละเกมใช้สีประจำเกมของตัวเองบนพื้นสีหมึกเข้ม */
+:root{
+  --bg:#0f1720; --surface:#17222d; --surface2:#1e2d3b; --line:#2a3b4b; --ink:#eaf0f4; --muted:#8aa0b2;
+  --amath:#2f9e6a; --sudoku:#2a9cc2; --g24:#ffcf5a; --chess:#c89b6a; --checkers:#3f9a7c; --accent:#ffcf5a; --accent-ink:#2a2007;
+  --bad:#ff917c; --good:#7bd88f;
+  --f-ui:'Sarabun',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --f-head:'Bricolage Grotesque','Arial Rounded MT Bold','Trebuchet MS',sans-serif;
+  color-scheme:dark;
+}
+[hidden]{display:none!important}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-ui);font-size:15px;line-height:1.5}
+a{color:inherit}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.wrap{max-width:720px;margin:0 auto;padding:16px;padding-block:20px 40px;display:flex;flex-direction:column;gap:22px}
+/* navbar */
+.nav{position:sticky;top:0;z-index:20;background:rgba(15,23,32,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top,0px)}
+.nav .in{max-width:720px;margin:0 auto;padding:10px 16px 0;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 12px}
+.nav .links{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;width:100%;order:3;margin:0 -8px;padding:0 8px}
+.nav .links::-webkit-scrollbar{display:none}
+.nav .links a{flex:none;text-decoration:none;color:var(--muted);padding:9px 12px;font-weight:700;border-bottom:3px solid transparent;white-space:nowrap}
+.nav .links a:hover{color:var(--ink)}
+.nav .links a[aria-current=true]{color:var(--ink);border-bottom-color:var(--accent)}
+.nav .links a.ext::after{content:'↗';font-size:11px;margin-left:4px;opacity:.6}
+.nav .logo{text-decoration:none}
+#who{order:2;display:flex;align-items:center;gap:8px}.nav .logo{order:1}
+@media (min-width:640px){.nav .in{max-width:1080px;flex-wrap:nowrap;padding-bottom:0}.nav .links{order:2;width:auto;margin:0;padding:0;flex:1;justify-content:center}#who{order:3}.nav .links a{padding:15px 9px}}
+section[id]{scroll-margin-top:110px}
+@media (min-width:640px){section[id]{scroll-margin-top:70px}}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+.logo{font-family:var(--f-head);font-weight:800;font-size:24px;letter-spacing:-.01em;display:flex;align-items:center;gap:10px}
+.logo i{display:grid;grid-template-columns:1fr 1fr;gap:3px;width:26px;height:26px}
+.logo i b{border-radius:4px;display:block}
+.logo i b:nth-child(1){background:var(--amath)}.logo i b:nth-child(2){background:var(--sudoku)}.logo i b:nth-child(3){background:var(--g24)}.logo i b:nth-child(4){background:#f3eee1}
+#who{min-width:0}
+#who a.wn{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:40vw;text-decoration:none;border-bottom:1px dashed var(--muted)}
+.pn{text-decoration:none}.pn:hover{text-decoration:underline}
+#who span{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:40vw}
+.btn{background:var(--accent);color:var(--accent-ink);border-radius:12px;padding:11px 18px;font-weight:700}
+.btn.alt{background:var(--surface2);color:var(--ink);border:1px solid var(--line)}
+.btn.sm{padding:7px 12px;font-size:14px;border-radius:10px}
+.btn:disabled{opacity:.5}
+h2{font-family:var(--f-head);font-size:22px;margin:0 0 10px;font-weight:800;text-wrap:balance}
+.sub{color:var(--muted);margin:0}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px}
+/* auth */
+.tabs{display:flex;gap:6px;margin-bottom:14px}
+.tab{flex:1;padding:9px 10px;border-radius:10px;background:var(--surface2);color:var(--muted);font-weight:700;text-align:center}
+.tab[aria-selected=true]{background:var(--accent);color:var(--accent-ink)}
+form{display:flex;flex-direction:column;gap:10px}
+label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted)}
+input{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:11px 12px;width:100%}
+#err{min-height:20px;color:var(--bad);font-size:14px}
+.linkb{align-self:center;color:var(--muted);text-decoration:underline;text-underline-offset:3px;font-size:14px;padding:6px 8px}
+.linkb:hover{color:var(--ink)}
+.rec{display:flex;flex-direction:column;gap:12px}
+.rec .code{font-family:var(--f-head);font-weight:800;font-size:28px;letter-spacing:.08em;text-align:center;background:var(--bg);border:1px dashed var(--accent);border-radius:12px;padding:14px 8px;color:var(--accent);-webkit-user-select:all;user-select:all;word-break:break-all}
+.rec p{margin:0}
+.ok{color:var(--good);font-size:14px;min-height:20px}
+.hint{font-size:12.5px;color:var(--muted);margin:0}
+/* modal */
+.backdrop{position:fixed;inset:0;z-index:50;background:rgba(5,10,15,.72);display:flex;align-items:flex-start;justify-content:center;padding:calc(env(safe-area-inset-top,0px) + 8vh) 16px 16px;overflow:auto}
+.sheet{position:relative;width:100%;max-width:400px;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.sheet .x{position:absolute;top:10px;right:10px;width:36px;height:36px;border-radius:10px;color:var(--muted)}
+.sheet .x:hover{background:var(--surface2);color:var(--ink)}
+.guest{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.guest p{margin:2px 0 0;font-size:14px}
+.demo{background:rgba(255,207,90,.14);border:1px dashed var(--accent);border-radius:12px;padding:10px 14px;font-size:13.5px;color:var(--ink)}
+/* profile */
+.me{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px;text-align:center}
+.me div{background:var(--bg);border-radius:12px;padding:10px 4px}
+.me b{display:block;font-family:var(--f-head);font-size:24px;font-variant-numeric:tabular-nums}
+.me span{font-size:12px;color:var(--muted)}
+/* games */
+.games{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.game{display:flex;flex-direction:column;gap:10px;text-decoration:none;background:var(--surface);border:1px solid var(--line);border-top:4px solid var(--c);border-radius:16px;padding:16px;min-width:0}
+.game:active{background:var(--surface2)}
+.game img{width:56px;height:56px;border-radius:14px}
+.game b{font-family:var(--f-head);font-size:20px}
+.game p{margin:0;color:var(--muted);font-size:14px}
+.game small{color:var(--c);font-weight:700;margin-top:auto;font-variant-numeric:tabular-nums}
+/* leaderboard */
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.chip{padding:6px 12px;border-radius:999px;background:var(--surface2);border:1px solid var(--line);font-size:14px;color:var(--muted)}
+.chip[aria-selected=true]{background:var(--ink);color:var(--bg);border-color:var(--ink);font-weight:700}
+.scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+th,td{padding:9px 6px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+th:nth-child(2),td:nth-child(2){text-align:left;width:100%;max-width:0;overflow:hidden;text-overflow:ellipsis}
+th:first-child,td:first-child{text-align:center;width:44px}
+th{font-size:12px;color:var(--muted);font-weight:500}
+tr.me-row td{background:rgba(255,207,90,.12);font-weight:700}
+.rk{font-family:var(--f-head);font-weight:800}
+.rk.r1{color:#ffd24a}.rk.r2{color:#d5dde4}.rk.r3{color:#e0996a}
+.empty{padding:22px 0;text-align:center;color:var(--muted)}
+footer{color:var(--muted);font-size:12.5px;text-align:center}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<header class="nav">
+  <div class="in">
+    <a class="logo" href="#top" aria-label="Taoob Arcade หน้าแรก"><i><b></b><b></b><b></b><b></b></i>Taoob Arcade</a>
+    <div id="who"><button class="btn sm" id="bIn">เข้าสู่ระบบ</button></div>
+    <nav class="links" id="navLinks" aria-label="เมนูหลัก">
+      <a href="#top" data-s="top" aria-current="true">หน้าแรก</a>
+      <a href="#games" data-s="games">เกม</a>
+      <a href="#ranking" data-s="ranking">อันดับ</a>
+      <a href="amath/" class="ext">A-Math</a>
+      <a href="sudoku/" class="ext">Sudoku</a>
+      <a href="game24/" class="ext">เกม 24</a>
+      <a href="chess/" class="ext">หมากรุก</a>
+      <a href="checkers/" class="ext">หมากฮอส</a>
+    </nav>
+  </div>
+</header>
+<div class="wrap" id="top">
+
+  <div class="backdrop" id="auth" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="amTitle">
+    <button class="x" id="bClose" aria-label="ปิด">✕</button>
+    <h2 id="amTitle" style="margin-bottom:12px">เข้าสู่ระบบ</h2>
+    <div class="tabs" role="tablist"><button class="tab" role="tab" id="tLogin" aria-selected="true">เข้าสู่ระบบ</button><button class="tab" role="tab" id="tReg" aria-selected="false">สมัครใหม่</button></div>
+    <form id="form" autocomplete="on">
+      <label>ชื่อผู้ใช้<input id="fUser" name="username" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" maxlength="16" required></label>
+      <label><span id="lPassT">รหัสผ่าน</span><input id="fPass" name="password" type="password" autocomplete="current-password" required></label>
+      <label id="lPass2" hidden>ยืนยันรหัสผ่าน<input id="fPass2" name="password2" type="password" autocomplete="new-password"></label>
+      <p class="hint" id="hintReg" hidden>รหัสผ่านต้องมี 6 ตัวขึ้นไป</p>
+      <p class="hint" id="hintReset" hidden>ใส่ชื่อผู้ใช้ให้ตรง แล้วตั้งรหัสผ่านใหม่กับยืนยันรหัสผ่านใหม่</p>
+      <div id="err" role="alert"></div>
+      <button class="btn" id="bGo" type="submit">เข้าสู่ระบบ</button>
+      <button type="button" class="linkb" id="bForgot">ลืมรหัสผ่าน? รีเซตรหัสผ่าน</button>
+      <button type="button" class="linkb" id="bBack" hidden>← กลับไปเข้าสู่ระบบ</button>
+      <p class="hint" id="hintGuest">ยังไม่ล็อกอินก็เล่นได้ แต่ผลจะไม่ติดอันดับ</p>
+    </form>
+  </div>
+</div>
+<section class="panel guest" id="guestBox" hidden aria-label="ยังไม่ได้เข้าสู่ระบบ">
+  <div><b>ยังไม่ได้เข้าสู่ระบบ</b><p class="sub">เล่นได้เลย แต่ผลจะติดอันดับเมื่อเข้าสู่ระบบ</p></div>
+  <button class="btn sm" id="bIn2">เข้าสู่ระบบ</button>
+</section>
+<div class="demo" id="demoBar" hidden>โหมดทดลอง: บัญชีและอันดับเก็บในเครื่องนี้เท่านั้น มีผู้เล่นตัวอย่างให้ดูหน้าตา ของจริงจะเชื่อม Supabase</div>
+
+  <section class="panel" id="meBox" hidden aria-label="โปรไฟล์ของฉัน">
+    <h2 style="margin:0">สวัสดี <span id="meName"></span></h2>
+    <div class="me"><div><b id="meRank">–</b><span>อันดับรวม</span></div><div><b id="mePts">0</b><span>แต้มรวม</span></div><div><b id="meWins">0</b><span>ชนะ</span></div></div>
+    <a class="linkb" href="profile/" style="margin-top:10px">ดูสถิติทั้งหมดของฉัน →</a>
+  </section>
+
+  <section id="games" aria-label="เกม">
+    <h2>เกม</h2>
+    <div class="games">
+      <a class="game" style="--c:var(--amath)" href="amath/"><img src="icons/amath.png" alt=""><b>A-Math</b><p>เรียงสมการลงกระดาน สู้กับ AI หรือเพื่อน</p><small id="gm-amath"></small></a>
+      <a class="game" style="--c:var(--sudoku)" href="sudoku/"><img src="icons/sudoku.png" alt=""><b>Sudoku</b><p>4 ระดับ มีโน้ต ใบ้ และแข่งกับเพื่อน</p><small id="gm-sudoku"></small></a>
+      <a class="game" style="--c:var(--g24)" href="game24/"><img src="icons/game24.png" alt=""><b>เกม 24</b><p>ใช้ไพ่ 4 ใบให้ได้ 24 เล่นเดี่ยวหรือแข่งกัน</p><small id="gm-game24"></small></a>
+      <a class="game" style="--c:var(--chess)" href="chess/"><img src="icons/chess.png" alt=""><b>หมากรุก</b><p>หมากรุกสากล สู้ AI เพื่อน หรือออนไลน์ มีนาฬิกา</p><small id="gm-chess"></small></a>
+      <a class="game" style="--c:var(--checkers)" href="checkers/"><img src="icons/checkers.png" alt=""><b>หมากฮอส</b><p>หมากฮอสไทย ฮอสบินได้ มีนาฬิกา เล่นออนไลน์ได้</p><small id="gm-checkers"></small></a>
+    </div>
+  </section>
+
+  <section id="ranking" aria-label="ตารางอันดับ">
+    <h2>ตารางอันดับ</h2>
+    <div class="panel">
+      <div class="chips" id="gTabs" role="tablist"></div>
+      <div class="chips" id="cTabs" role="tablist"></div>
+      <p class="sub" id="lbNote" style="margin-bottom:6px"></p>
+      <div class="scroll"><table><thead id="lbHead"></thead><tbody id="lbBody"></tbody></table></div>
+      <div class="empty" id="lbEmpty" hidden></div>
+    </div>
+  </section>
+  <footer>ผลที่ส่งจากเกมไม่ได้ผ่านการตรวจสอบฝั่งเซิร์ฟเวอร์ ใช้เพื่อความสนุกระหว่างเพื่อนๆ</footer>
+</div>
+<script src="platform.js"></script>
+<script>
+(function(){
+'use strict';
+var $=function(id){return document.getElementById(id);};
+var esc=function(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});};
+var LV={easy:'ง่าย',medium:'กลาง',hard:'ยาก',expert:'โหด'};
+var GAMES={
+  overall:{name:'รวมทุกเกม'},
+  amath:{name:'A-Math',cats:[['easy','สู้ AI ง่าย'],['medium','สู้ AI กลาง'],['hard','สู้ AI ยาก'],['online','แข่งกับเพื่อน']]},
+  sudoku:{name:'Sudoku',cats:[['easy','ง่าย'],['medium','กลาง'],['hard','ยาก'],['expert','โหด'],['online','แข่งกับเพื่อน']]},
+  game24:{name:'เกม 24',cats:[['easy','ง่าย'],['medium','กลาง'],['hard','ยาก'],['expert','โหด'],['online','แข่งกับเพื่อน']]},
+  chess:{name:'หมากรุก',cats:[['easy','สู้ AI ง่าย'],['medium','สู้ AI กลาง'],['hard','สู้ AI ยาก'],['online','แข่งกับเพื่อน']]},
+  checkers:{name:'หมากฮอส',cats:[['easy','สู้ AI ง่าย'],['medium','สู้ AI กลาง'],['hard','สู้ AI ยาก'],['online','แข่งกับเพื่อน']]}
+};
+var st={game:'overall',cat:null,mode:'login',rows:{},overall:null,error:null,loading:false};
+function fmtTime(t){t=+t;if(t>=60){var m=Math.floor(t/60),s=Math.round(t-m*60);if(s===60){m++;s=0;}return m+':'+(s<10?'0':'')+s;}return t.toFixed(1)+' วิ';}
+
+/* ---------- บัญชี ---------- */
+var opener=null;
+function openAuth(m){opener=document.activeElement;setMode(m||'login');$('err').textContent='';$('auth').hidden=false;setTimeout(function(){$('fUser').focus();},30);}
+function closeAuth(){$('auth').hidden=true;if(opener&&opener.focus)try{opener.focus();}catch(e){}}
+$('bClose').onclick=closeAuth;
+$('auth').addEventListener('mousedown',function(e){if(e.target===$('auth'))closeAuth();});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!$('auth').hidden)closeAuth();});
+$('bIn2').onclick=function(){openAuth('login');};
+function showAuth(u){
+  if(u&&!$('auth').hidden)$('auth').hidden=true;
+  $('guestBox').hidden=!!u||!Arcade.ready;$('meBox').hidden=!u;
+  $('demoBar').hidden=!Arcade.demo;
+  $('who').innerHTML=u?'<a id="whoName" class="wn" href="profile/" title="ดูโปรไฟล์ของฉัน"></a> <button class="btn alt sm" id="bOut">ออก</button>':'<button class="btn sm" id="bIn">เข้าสู่ระบบ</button>';
+  if(u){$('whoName').textContent=u.username;$('meName').textContent=u.username;}
+  if(window.__navSpy)setTimeout(window.__navSpy,0);
+}
+$('who').addEventListener('click',function(e){
+  if(e.target.closest('#bOut'))Arcade.logout();
+  else if(e.target.closest('#bIn'))openAuth('login');
+});
+function setMode(m){
+  st.mode=m;var reg=m==='reg',rst=m==='reset';
+  $('form').hidden=false;$('amTitle').textContent=rst?'รีเซตรหัสผ่าน':'เข้าสู่ระบบ';
+  document.querySelector('#auth .tabs').hidden=rst;
+  $('tLogin').setAttribute('aria-selected',String(m==='login'));$('tReg').setAttribute('aria-selected',String(reg));
+  $('lPass2').hidden=!(reg||rst);$('hintReg').hidden=!reg;$('hintReset').hidden=!rst;
+  $('bForgot').hidden=m!=='login';$('bBack').hidden=!rst;$('hintGuest').hidden=rst;
+  $('fPass2').required=reg||rst;$('lPassT').textContent=rst?'รหัสผ่านใหม่':'รหัสผ่าน';
+  $('fPass').autocomplete=(reg||rst)?'new-password':'current-password';
+  $('bGo').textContent=reg?'สมัครและเข้าสู่ระบบ':rst?'ตั้งรหัสผ่านใหม่':'เข้าสู่ระบบ';$('err').textContent='';
+}
+$('bForgot').onclick=function(){setMode('reset');};
+$('bBack').onclick=function(){setMode('login');};
+$('tLogin').onclick=function(){setMode('login');};$('tReg').onclick=function(){setMode('reg');};
+$('form').addEventListener('submit',function(e){
+  e.preventDefault();var u=$('fUser').value,p=$('fPass').value,b=$('bGo');$('err').textContent='';$('err').style.color='';
+  var two=st.mode==='reg'||st.mode==='reset';
+  if(two&&p!==$('fPass2').value){$('err').textContent='รหัสผ่านสองช่องไม่ตรงกัน';return;}
+  if(two&&p.length<6){$('err').textContent='รหัสผ่านต้องมี 6 ตัวขึ้นไป';return;}
+  b.disabled=true;
+  var done=function(){b.disabled=false;$('fPass').value='';$('fPass2').value='';};
+  var fail=function(er){b.disabled=false;$('err').textContent=(er&&er.message)||'ทำรายการไม่สำเร็จ';};
+  if(st.mode==='reset'){
+    Arcade.resetPassword(u,p).then(function(){done();setMode('login');$('fUser').value=u;$('err').style.color='var(--good)';$('err').textContent='ตั้งรหัสผ่านใหม่แล้ว เข้าสู่ระบบด้วยรหัสใหม่ได้เลย';},fail);
+    return;
+  }
+  (st.mode==='reg'?Arcade.register(u,p):Arcade.login(u,p)).then(function(){done();closeAuth();},fail);
+});
+/* เมนูบน: ไฮไลต์ส่วนที่กำลังดูอยู่ */
+(function(){
+  var links=[].slice.call(document.querySelectorAll('#navLinks a[data-s]')),ids=['top','games','ranking'];
+  function mark(id){links.forEach(function(a){a.setAttribute('aria-current',String(a.dataset.s===id));});}
+  function spy(){
+    var y=window.scrollY+130,cur='top';
+    if(window.innerHeight+window.scrollY>=document.body.scrollHeight-4)cur='ranking';
+    else ids.forEach(function(id){var el=$(id);if(el&&id!=='top'&&el.getBoundingClientRect().top+window.scrollY<=y)cur=id;});
+    mark(cur);
+  }
+  window.__navSpy=spy;window.addEventListener('scroll',spy,{passive:true});window.addEventListener('resize',spy);
+  links.forEach(function(a){a.addEventListener('click',function(){mark(a.dataset.s);});});
+  spy();
+})();
+
+/* ---------- อันดับ ---------- */
+function renderTabs(){
+  $('gTabs').innerHTML=Object.keys(GAMES).map(function(k){return'<button class="chip" role="tab" data-g="'+k+'" aria-selected="'+(k===st.game)+'">'+GAMES[k].name+'</button>';}).join('');
+  var g=GAMES[st.game];
+  $('cTabs').hidden=!g.cats;
+  if(g.cats){if(!st.cat||!g.cats.some(function(c){return c[0]===st.cat;}))st.cat=g.cats[0][0];
+    $('cTabs').innerHTML=g.cats.map(function(c){return'<button class="chip" role="tab" data-c="'+c[0]+'" aria-selected="'+(c[0]===st.cat)+'">'+c[1]+'</button>';}).join('');}
+}
+$('gTabs').addEventListener('click',function(e){var b=e.target.closest('[data-g]');if(!b)return;st.game=b.dataset.g;st.cat=null;renderTabs();loadBoard();});
+$('cTabs').addEventListener('click',function(e){var b=e.target.closest('[data-c]');if(!b)return;st.cat=b.dataset.c;renderTabs();drawBoard();});
+function loadBoard(){
+  st.error=null;st.loading=true;drawBoard();
+  var p=st.game==='overall'?Arcade.overall().then(function(r){st.overall=r;}):Arcade.board(st.game).then(function(r){st.rows[st.game]=r;});
+  p.then(function(){st.loading=false;drawBoard();},function(){st.loading=false;st.error=true;drawBoard();});
+}
+function nameCell(u){return'<td><a class="pn" href="profile/?u='+encodeURIComponent(u)+'">'+esc(u)+'</a></td>';}
+function rankCell(i){return'<td><span class="rk'+(i<3?' r'+(i+1):'')+'">'+(i+1)+'</span></td>';}
+function drawBoard(){
+  var me=Arcade.user(),head,rows,note='';
+  var body=$('lbBody'),empty=$('lbEmpty');body.innerHTML='';$('lbHead').innerHTML='';empty.hidden=true;$('lbNote').textContent='';
+  if(st.loading){empty.hidden=false;empty.textContent='กำลังโหลด…';return;}
+  if(st.error){empty.hidden=false;empty.textContent='โหลดอันดับไม่ได้ (ตรวจว่ารัน schema.sql ใน Supabase แล้ว และออนไลน์อยู่)';return;}
+  var list;
+  if(st.game==='overall'){
+    list=(st.overall||[]).filter(function(r){return r.plays>0;}).sort(function(a,b){return b.points-a.points||b.wins-a.wins||(a.username<b.username?-1:1);});
+    head='<tr><th>#</th><th>ผู้เล่น</th><th>แต้ม</th><th>ชนะ</th><th>เล่น</th></tr>';
+    note='แต้มสะสมจากชัยชนะในทุกเกม (ระดับยากได้แต้มมากกว่า ชนะเพื่อนได้ 5 แต้ม)';
+    rows=list.map(function(r,i){return{u:r.username,html:rankCell(i)+nameCell(r.username)+'<td>'+r.points+'</td><td>'+r.wins+'</td><td>'+r.plays+'</td>'};});
+  }else{
+    var all=(st.rows[st.game]||[]).filter(function(r){return r.cat===st.cat;});
+    var winsGame=(st.game==='amath'||st.game==='chess'||st.game==='checkers');
+    var timed=!winsGame&&st.cat!=='online';
+    if(timed){
+      list=all.filter(function(r){return r.best_time!=null;}).sort(function(a,b){return a.best_time-b.best_time||b.wins-a.wins;});
+      head='<tr><th>#</th><th>ผู้เล่น</th><th>เวลาที่เร็วสุด</th><th>ชนะ</th></tr>';note='จัดอันดับตามเวลาที่เร็วที่สุด (ไม่ใช้ใบ้)';
+      rows=list.map(function(r,i){return{u:r.username,html:rankCell(i)+nameCell(r.username)+'<td>'+fmtTime(r.best_time)+'</td><td>'+r.wins+'</td>'};});
+    }else if(winsGame&&st.cat!=='online'&&st.game!=='amath'){
+      list=all.filter(function(r){return r.wins>0;}).sort(function(a,b){return b.wins-a.wins||a.plays-b.plays;});
+      head='<tr><th>#</th><th>ผู้เล่น</th><th>ชนะ AI</th><th>เล่น</th></tr>';note='จัดอันดับตามจำนวนครั้งที่ชนะ AI';
+      rows=list.map(function(r,i){return{u:r.username,html:rankCell(i)+nameCell(r.username)+'<td>'+r.wins+'</td><td>'+r.plays+'</td>'};});
+    }else if(st.game==='amath'&&st.cat!=='online'){
+      list=all.filter(function(r){return r.wins>0;}).sort(function(a,b){return b.wins-a.wins||(b.best_score||0)-(a.best_score||0);});
+      head='<tr><th>#</th><th>ผู้เล่น</th><th>ชนะ AI</th><th>คะแนนสูงสุด</th></tr>';note='จัดอันดับตามจำนวนครั้งที่ชนะ AI';
+      rows=list.map(function(r,i){return{u:r.username,html:rankCell(i)+nameCell(r.username)+'<td>'+r.wins+'</td><td>'+(r.best_score==null?'–':r.best_score)+'</td>'};});
+    }else{
+      list=all.filter(function(r){return r.plays>0;}).sort(function(a,b){return b.wins-a.wins||a.plays-b.plays;});
+      head='<tr><th>#</th><th>ผู้เล่น</th><th>ชนะ</th><th>แข่ง</th></tr>';note='จัดอันดับตามจำนวนครั้งที่ชนะเพื่อน';
+      rows=list.map(function(r,i){return{u:r.username,html:rankCell(i)+nameCell(r.username)+'<td>'+r.wins+'</td><td>'+r.plays+'</td>'};});
+    }
+  }
+  $('lbNote').textContent=note;
+  if(!rows.length){empty.hidden=false;empty.textContent='ยังไม่มีใครติดอันดับ ลองเล่นเป็นคนแรก';return;}
+  $('lbHead').innerHTML=head;
+  var top=rows.slice(0,30),mi=-1;rows.forEach(function(r,i){if(me&&r.u===me.username)mi=i;});
+  var html=top.map(function(r){return'<tr'+(me&&r.u===me.username?' class="me-row"':'')+'>'+r.html+'</tr>';}).join('');
+  if(mi>=30)html+='<tr class="me-row">'+rows[mi].html.replace(/<span class="rk[^"]*">\d+<\/span>/,'<span class="rk">'+(mi+1)+'</span>')+'</tr>';
+  body.innerHTML=html;
+}
+
+/* ---------- โปรไฟล์ / สรุปบนการ์ดเกม ---------- */
+function loadMine(){
+  var u=Arcade.user();
+  ['amath','sudoku','game24','chess','checkers'].forEach(function(g){$('gm-'+g).textContent='';});
+  if(!u)return;
+  Promise.all([Arcade.mine(),Arcade.overall()]).then(function(res){
+    var mine=res[0],ov=res[1].filter(function(r){return r.plays>0;}).sort(function(a,b){return b.points-a.points||b.wins-a.wins||(a.username<b.username?-1:1);});
+    var i=ov.findIndex(function(r){return r.username===u.username;});
+    var me=ov[i];
+    $('meRank').textContent=i>=0?'#'+(i+1):'–';$('mePts').textContent=me?me.points:0;$('meWins').textContent=me?me.wins:0;
+    ['amath','sudoku','game24','chess','checkers'].forEach(function(g){
+      var rs=mine.filter(function(r){return r.game===g;}),w=rs.reduce(function(a,r){return a+r.wins;},0),p=rs.reduce(function(a,r){return a+r.points;},0);
+      $('gm-'+g).textContent=rs.length?'ชนะ '+w+' · '+p+' แต้ม':'ยังไม่เคยเล่น';
+    });
+  },function(){});
+}
+Arcade.onChange(function(u){showAuth(u);loadMine();drawBoard();});
+setMode('login');renderTabs();
+Arcade.ready.then(function(){showAuth(Arcade.user());loadBoard();loadMine();if(location.hash==='#login'&&!Arcade.user())openAuth('login');});
+})();
+</script>
+</body>
+</html>
