@@ -1,0 +1,6 @@
+:root{--sq-l:#f0d9b5;--sq-d:#b58863;--frame:#4a3320}
+.pc{font-family:'Segoe UI Symbol','Noto Sans Symbols 2','Apple Symbols','DejaVu Sans',system-ui,sans-serif;font-size:calc(var(--bsz)/8*.8);line-height:1;pointer-events:none;position:relative;z-index:1}
+.pc.w{color:#fdfdfb;text-shadow:1px 0 #1b1208,-1px 0 #1b1208,0 1px #1b1208,0 -1px #1b1208,1px 1px #1b1208,-1px -1px #1b1208,1px -1px #1b1208,-1px 1px #1b1208}
+.pc.b{color:#1d1610;text-shadow:0 1px 1px rgba(255,255,255,.28)}
+.promo .pc{font-size:44px;pointer-events:auto}
+.cap .pc{font-size:15px}

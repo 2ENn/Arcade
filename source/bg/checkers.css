@@ -1,0 +1,20 @@
+:root{--sq-l:#ead9b5;--sq-d:#2f6b57;--frame:#1f3f35;--accent:#2f6b57}
+@media (prefers-color-scheme:dark){:root{--accent:#4a9a7e}}
+.pc.m,.pc.k{width:76%;height:76%;border-radius:50%;display:flex;align-items:center;justify-content:center;pointer-events:none;position:relative;z-index:1;font-size:calc(var(--bsz)/8*.42);line-height:1;transition:transform .12s}
+.pc.w{background:radial-gradient(circle at 35% 30%,#fffaf0,#e9dcc0 55%,#c8b78e);box-shadow:0 3px 0 #9d8c63,0 5px 8px rgba(0,0,0,.35),inset 0 0 0 3px rgba(150,130,90,.35);color:#7b6a3c}
+.pc.b{background:radial-gradient(circle at 35% 30%,#6b5650,#2c211e 55%,#150f0d);box-shadow:0 3px 0 #090606,0 5px 8px rgba(0,0,0,.45),inset 0 0 0 3px rgba(255,255,255,.12);color:#e6c36a}
+.pc.k{outline:2px solid #e6b422;outline-offset:-5px}
+.sq.sel .pc{transform:translateY(-3px) scale(1.04)}
+/* ไฮไลต์ให้เห็นชัดบนช่องเขียวเข้ม */
+.sq.last::before{background:rgba(255,226,70,.55);box-shadow:inset 0 0 0 3px rgba(255,236,120,.95)}
+.sq.sel::before{background:rgba(120,235,160,.6);box-shadow:inset 0 0 0 4px #b8ffd0}
+.sq.mv::after{width:36%;height:36%;background:#ffe14d;border:3px solid #fff;box-shadow:0 0 0 2px rgba(0,0,0,.45),0 0 14px 3px rgba(255,225,77,.85);animation:ckpulse 1.1s ease-in-out infinite}
+.sq.cp::after{inset:6%;width:auto;height:auto;border:calc(var(--bsz)/8*.1) solid #ff5a4d;background:rgba(255,90,77,.28);box-shadow:0 0 0 2px #fff,0 0 14px 3px rgba(255,90,77,.8);animation:ckpulse 1.1s ease-in-out infinite}
+.sq.can::before{box-shadow:inset 0 0 0 4px rgba(255,255,255,.85),inset 0 0 14px 2px rgba(255,225,77,.8)}
+@keyframes ckpulse{50%{transform:scale(1.14)}}
+@media (prefers-reduced-motion:reduce){.sq.mv::after,.sq.cp::after{animation:none}}
+/* ตัวที่จะถูกกิน + ช่องลงของการกิน */
+.sq.cp::after{width:36%;height:36%;inset:auto;background:#ff5a4d;border:3px solid #fff;box-shadow:0 0 0 2px rgba(0,0,0,.5),0 0 14px 3px rgba(255,90,77,.9)}
+.sq.tk .pc{box-shadow:0 0 0 3px #fff,0 0 0 6px #ff3b30,0 0 16px 6px rgba(255,59,48,.85);animation:ckpulse 1.1s ease-in-out infinite}
+.sq.tk .pc::after{content:'✕';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#ff3b30;font:800 calc(var(--bsz)/8*.5)/1 var(--f-head);text-shadow:0 0 3px #fff,0 0 6px #fff}
+@media (prefers-reduced-motion:reduce){.sq.tk .pc{animation:none}}
