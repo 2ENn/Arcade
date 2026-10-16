@@ -85,7 +85,11 @@
     if (/rate|too many|over_.*limit/i.test(m + c)) return 'ลองบ่อยเกินไป รอสักครู่แล้วลองใหม่';
     if (/database error|unexpected_failure/i.test(m + c)) return 'ชื่อนี้ใช้ไม่ได้หรือมีคนใช้แล้ว ลองชื่ออื่น';
     if (/fetch|network|failed/i.test(m)) return 'เชื่อมต่อเซิร์ฟเวอร์ไม่ได้ ลองอีกครั้ง';
-    return 'ทำรายการไม่สำเร็จ ลองอีกครั้ง';
+    if (/signup.*disabled|signups not allowed|email_provider_disabled|provider.*disabled/i.test(m + c)) return 'ระบบปิดรับสมัครอยู่ (ผู้ดูแลต้องเปิด Enable sign ups / Email provider ใน Supabase)';
+    if (/email.*invalid|invalid.*email|email_address_invalid/i.test(m + c)) return 'Supabase ไม่รับอีเมลภายในของระบบ (email_address_invalid) แจ้งผู้ดูแล';
+    if (/captcha/i.test(m + c)) return 'Supabase เปิด Captcha อยู่ ต้องปิดในเมนู Authentication';
+    if (/api key|apikey|jwt|invalid.*key/i.test(m + c)) return 'API key ไม่ถูกต้อง (ตรวจ key/URL ใน platform.js)';
+    return 'ทำรายการไม่สำเร็จ [' + (c || (e && e.status) || '?') + '] ' + m.slice(0, 120);
   }
   function register(u, p) {
     u = normName(u);
