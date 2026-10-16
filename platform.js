@@ -7,7 +7,7 @@
     url: 'https://suzjjwaamfsekokiukhj.supabase.co',
     key: 'sb_publishable_TxqJlQHRp_PdAnUUVRzVyQ_J56oGHHq',     // publishable key ใส่ในเว็บได้ (ห้ามใส่ service_role)
     lib: 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js',
-    emailDomain: 'players.taoob.app',                          // ใช้แปลงชื่อผู้ใช้เป็นอีเมลภายใน (ไม่มีการส่งอีเมลจริง)
+    emailDomain: 'gmail.com',                                  // ใช้แปลงชื่อผู้ใช้เป็นอีเมลภายใน (ไม่มีการส่งอีเมลจริง)
     storageKey: 'arcade.auth.v1', queueKey: 'arcade.queue.v1'
   };
   var client = null, user = null, listeners = [], libPromise = null, readyResolve, readyDone = false;
@@ -50,7 +50,7 @@
 
   function normName(u) { return String(u || '').trim().toLowerCase(); }
   function validName(u) { return /^[a-z0-9_]{3,16}$/.test(u); }
-  function emailOf(u) { return u + '@' + CFG.emailDomain; }
+  function emailOf(u) { return u + '.arcade@' + CFG.emailDomain; }  /* ใช้โดเมนที่มี MX จริง ไม่งั้น Supabase ตอบ email_address_invalid */
   function needClient() { return client ? Promise.resolve() : Promise.reject({ code: 'offline', message: 'เชื่อมต่อเซิร์ฟเวอร์ไม่ได้ ลองอีกครั้ง' }); }
 
   /* รหัสผ่านต้องมี 6 ตัวขึ้นไป (ตอนสมัคร): แปลงเป็นรหัสยาวคงที่ด้วย SHA-256 ในเครื่องก่อนส่ง จึงไม่ติดกฎความยาวของ Supabase */
