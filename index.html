@@ -220,7 +220,7 @@ function showAuth(u){
   if(window.__navSpy)setTimeout(window.__navSpy,0);
 }
 $('who').addEventListener('click',function(e){
-  else if(e.target.closest('#bIn'))openAuth('login');
+  if(e.target.closest('#bIn'))openAuth('login');
 });
 function setMode(m){
   st.mode=m;var reg=m==='reg',rst=m==='reset';
