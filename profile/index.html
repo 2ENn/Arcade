@@ -67,6 +67,7 @@ tr:last-child td{border-bottom:0}
 .bar i{display:block;height:100%;background:var(--c);border-radius:99px}
 .none{color:var(--muted);margin:0}
 .panel{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px;text-align:center}
+.btn.out{border:1px solid var(--line);background:var(--surface2);color:var(--ink);font:700 14px var(--f-ui);cursor:pointer;padding:9px 14px;flex:none}
 .btn{display:inline-block;background:var(--accent);color:var(--accent-ink);border-radius:12px;padding:11px 18px;font-weight:700;text-decoration:none}
 .sub{color:var(--muted);margin:0 0 12px}
 .err{color:#ff917c;text-align:center}
@@ -76,7 +77,7 @@ tr:last-child td{border-bottom:0}
   <div id="load" class="sub" style="text-align:center">กำลังโหลด…</div>
   <div id="err" class="err" hidden></div>
   <section id="prof" hidden>
-    <div class="who"><div class="av" id="av"></div><div><h1 id="nm"></h1><p id="who"></p></div></div>
+    <div class="who"><div class="av" id="av"></div><div style="flex:1;min-width:0"><h1 id="nm"></h1><p id="who"></p></div><button type="button" class="btn out" id="pOut" hidden>ออกจากระบบ</button></div>
     <div class="tiles" style="margin-top:16px"><div class="tile"><b id="tRank">–</b><span>อันดับรวม</span></div><div class="tile"><b id="tPts">0</b><span>แต้มรวม</span></div><div class="tile"><b id="tWins">0</b><span>ชนะ</span></div><div class="tile"><b id="tPlays">0</b><span>เล่นทั้งหมด</span></div><div class="tile"><b id="tRate">–</b><span>อัตราชนะ</span></div></div>
     <h2 style="margin-top:22px">ผลงานแต่ละเกม</h2>
     <div id="games"></div>
@@ -99,7 +100,7 @@ function fmtTime(t){t=+t;if(t>=60){var m=Math.floor(t/60),s=Math.round(t-m*60);i
 function pct(w,p){return p?Math.round(100*w/p):0;}
 function render(name,rows,ov,isMe){
   document.title=(isMe?'โปรไฟล์ของฉัน':'โปรไฟล์ '+name)+' — Taoob Arcade';
-  $('av').textContent=name.charAt(0);$('nm').textContent=name;$('who').textContent=isMe?'โปรไฟล์ของคุณ':'ผู้เล่นใน Taoob Arcade';
+  $('pOut').hidden=!isMe;$('av').textContent=name.charAt(0);$('nm').textContent=name;$('who').textContent=isMe?'โปรไฟล์ของคุณ':'ผู้เล่นใน Taoob Arcade';
   var list=ov.filter(function(r){return r.plays>0;}).sort(function(a,b){return b.points-a.points||b.wins-a.wins||(a.username<b.username?-1:1);});
   var i=list.findIndex(function(r){return r.username===name;}),me=ov.filter(function(r){return r.username===name;})[0]||{points:0,wins:0,plays:0};
   $('tRank').textContent=i>=0?'#'+(i+1):'–';$('tPts').textContent=me.points||0;$('tWins').textContent=me.wins||0;$('tPlays').textContent=me.plays||0;$('tRate').textContent=me.plays?pct(me.wins,me.plays)+'%':'–';
@@ -138,6 +139,7 @@ function load(){
     },function(){if(my!==tok)return;$('load').hidden=true;$('err').hidden=false;$('err').textContent='โหลดสถิติไม่ได้ ตรวจว่าออนไลน์อยู่และรัน schema.sql แล้ว';});
   });
 }
+$('pOut').onclick=function(){Arcade.logout();};
 Arcade.onChange(function(){load();});
 })();
 </script>
@@ -170,9 +172,8 @@ Arcade.onChange(function(){load();});
   var f=document.createElement('link');f.rel='stylesheet';f.href='https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=Sarabun:wght@400;700&display=swap';document.head.appendChild(f);
   Arcade.onChange(function(u){
     if(!u){el.innerHTML='<a class="gbtn" href="../#login">เข้าสู่ระบบ</a>';return;}
-    el.innerHTML='<a class="gname" href="../profile/" title="ดูโปรไฟล์ของฉัน"></a> <button class="gbtn alt" id="gOut">ออก</button>';
+    el.innerHTML='<a class="gname" href="../profile/" title="ดูโปรไฟล์/สถิติของฉัน"></a>';
     el.firstChild.textContent=u.username;
-    document.getElementById('gOut').onclick=function(){Arcade.logout();};
   });
 })();
 </script>

@@ -979,9 +979,8 @@ showMenu();initRoom();
   var f=document.createElement('link');f.rel='stylesheet';f.href='https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=Sarabun:wght@400;700&display=swap';document.head.appendChild(f);
   Arcade.onChange(function(u){
     if(!u){el.innerHTML='<a class="gbtn" href="../#login">เข้าสู่ระบบ</a>';return;}
-    el.innerHTML='<a class="gname" href="../profile/" title="ดูโปรไฟล์ของฉัน"></a> <button class="gbtn alt" id="gOut">ออก</button>';
+    el.innerHTML='<a class="gname" href="../profile/" title="ดูโปรไฟล์/สถิติของฉัน"></a>';
     el.firstChild.textContent=u.username;
-    document.getElementById('gOut').onclick=function(){Arcade.logout();};
   });
 })();
 </script>

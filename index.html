@@ -215,12 +215,11 @@ function showAuth(u){
   if(u&&!$('auth').hidden)$('auth').hidden=true;
   $('guestBox').hidden=!!u||!Arcade.ready;$('meBox').hidden=!u;
   $('demoBar').hidden=!Arcade.demo;
-  $('who').innerHTML=u?'<a id="whoName" class="wn" href="profile/" title="ดูโปรไฟล์ของฉัน"></a> <button class="btn alt sm" id="bOut">ออก</button>':'<button class="btn sm" id="bIn">เข้าสู่ระบบ</button>';
+  $('who').innerHTML=u?'<a id="whoName" class="wn" href="profile/" title="ดูโปรไฟล์ของฉัน"></a>':'<button class="btn sm" id="bIn">เข้าสู่ระบบ</button>';
   if(u){$('whoName').textContent=u.username;$('meName').textContent=u.username;}
   if(window.__navSpy)setTimeout(window.__navSpy,0);
 }
 $('who').addEventListener('click',function(e){
-  if(e.target.closest('#bOut'))Arcade.logout();
   else if(e.target.closest('#bIn'))openAuth('login');
 });
 function setMode(m){
