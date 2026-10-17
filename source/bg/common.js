@@ -7,7 +7,7 @@ function oppTag(){const n=typeof on!=='undefined'&&on&&on.opp&&on.opp.nm;return(
 /* ph('ตา','') => 'ตา mint' หรือ 'ตาเพื่อน' (ใช้ชื่อบัญชีของคู่แข่งถ้ามี) */
 function ph(a,b){const t=oppTag();return t?(a+' '+t+' '+b).trim():a+'เพื่อน'+b;}
 const KEY=UI.key,other=c=>c==='w'?'b':'w',CN={w:'ฝ่ายขาว',b:'ฝ่ายดำ'};
-const ST=Object.assign({lvl:'medium',side:'r',timed:false,mins:5,inc:0},ls.get(KEY+'.set.v1')||{});
+const ST=Object.assign({lvl:'medium',side:'r',timed:false,mins:5,inc:0,force:1},ls.get(KEY+'.set.v1')||{});
 let M=null,on=null,roomNS=null,toastT=0;
 function toast(t){const e=$('toast');e.textContent=t;e.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>e.hidden=true,2400);}
 function openModal(h){$('modalCard').innerHTML=h;$('modal').hidden=false;}
@@ -32,6 +32,9 @@ function renderMenu(){
   $('timeOpts').hidden=!ST.timed;
   chips('cMins',UI.mins.map(m=>[m,m+' นาที']),ST.mins,v=>ST.mins=+v);
   chips('cInc',[[0,'ไม่บวก'],[2,'+2 วิ'],[5,'+5 วิ']],ST.inc,v=>ST.inc=+v);
+  $('ruleBox').hidden=Core.name!=='checkers';
+  chips('cRule',[[1,'บังคับกิน'],[0,'ไม่บังคับกิน']],ST.force===0?0:1,v=>ST.force=+v);
+  $('ruleHint').textContent=ST.force===0?'มีตัวให้กินก็เลือกเดินอย่างอื่นได้':'ถ้ามีตัวให้กิน ต้องกินก่อนเสมอ';
   chips('cSide',[['r','สุ่ม'],['w','ขาว'],['b','ดำ']],ST.side,v=>ST.side=v);
   $('lvs').innerHTML=LV.map(l=>'<button class="lv" data-lv="'+l[0]+'"><div><b>'+l[1]+'</b><small>'+l[2]+'</small></div><div class="dots">'+[1,2,3].map(i=>'<i'+(i<=l[3]?' class="on"':'')+'></i>').join('')+'</div></button>').join('');
   $('lvs').querySelectorAll('.lv').forEach(b=>b.onclick=()=>{ST.lvl=b.dataset.lv;ls.set(KEY+'.set.v1',ST);startAI();});
@@ -40,18 +43,20 @@ function renderMenu(){
   $('bHost').disabled=!roomNS;$('bJoin').disabled=!roomNS;
   $('pvpSub').textContent=roomNS?'สร้างห้องแล้วส่งรหัส 6 หลักให้เพื่อน':'เปิดจากเว็บที่ออนไลน์เพื่อเล่นกับเพื่อน (ตอนนี้ใช้ไม่ได้)';
 }
-function cfgNow(){return{t:ST.timed?ST.mins*60:0,inc:ST.timed?ST.inc:0};}
+function cfgNow(){return{t:ST.timed?ST.mins*60:0,inc:ST.timed?ST.inc:0,f:ST.force===0?0:1};}
+const ruleTxt=c=>Core.name==='checkers'?(c&&c.f===0?'กติกา: ไม่บังคับกิน':'กติกา: บังคับกิน'):'';
 function showMenu(){try{saveGame();}catch(e){}stopTick();M=null;if(window.EM)EM.enable(false);$('game').hidden=true;$('menu').hidden=false;document.documentElement.classList.add('mn');closeModal();renderMenu();}
 
 /* ---------- แมตช์ ---------- */
 function begin(o){ // o:{mode,my,cfg,lvl}
   UI.reset();
-  const s0=Core.init();
+  const s0=Core.init(o.cfg.f!==0);
   M={mode:o.mode,my:o.my,lvl:o.lvl,cfg:o.cfg,states:[s0],hist:[],moves:[],over:null,busy:false,
      clock:{rem:{w:o.cfg.t*1000,b:o.cfg.t*1000},run:o.cfg.t?'w':null,since:Date.now()}};
   $('menu').hidden=true;$('game').hidden=false;document.documentElement.classList.remove('mn');closeModal();
   UI.mount($('board'));
   render();startTick();
+  if(ruleTxt(M.cfg))toast(ruleTxt(M.cfg));
   if(M.mode==='ai'&&M.my==='b')aiTurn();
 }
 const cur=()=>M.states[M.states.length-1];
@@ -65,7 +70,7 @@ function saveGame(){
 function loadSave(){const v=ls.get(SAVEK);return(v&&v.v===1&&Array.isArray(v.hist)&&v.hist.length&&v.cfg&&v.rem&&(v.mode==='ai'||v.mode==='local'))?v:null;}
 function resumeGame(){
   const sv=loadSave();if(!sv)return;
-  let st=Core.init();const states=[st],moves=[],hist=[];
+  let st=Core.init(sv.cfg.f!==0);const states=[st],moves=[],hist=[];
   for(const id of sv.hist){const m=Core.fromId(st,id);if(!m){ls.set(SAVEK,null);toast('เกมที่เซฟไว้ใช้ไม่ได้');renderMenu();return;}st=Core.apply(st,m);states.push(st);moves.push(m);hist.push(id);}
   if(Core.result(states)){ls.set(SAVEK,null);renderMenu();return;}
   UI.reset();
@@ -364,7 +369,7 @@ function rosterHost(me){
 function hostOpen(){
   if(!roomNS||on)return;
   const code=genCode(),cfg=cfgNow();
-  const me=on=newOn('host',code,'p',{cfgp:[cfg.t,cfg.inc]});
+  const me=on=newOn('host',code,'p',{cfgp:[cfg.t,cfg.inc,cfg.f]});
   openModal('<h2>กำลังสร้างห้อง…</h2><div class="spin"></div>');
   roomNS.join(roomName(code)).then(room=>{
     if(on!==me){room.leave();return;}
@@ -381,7 +386,7 @@ function hostStart(rematch){
   else if(me.pl.indexOf(me.meId)>=0&&ST.side!=='r')cw=ST.side==='w'?me.meId:me.pl.find(id=>id!==me.meId);
   else cw=me.pl[Math.random()<.5?0:1];
   me.cw=cw;me.st=1;me.started=true;me.over=false;
-  const cfg=cfgNow();me.cfgp=[cfg.t,cfg.inc];
+  const cfg=cfgNow();me.cfgp=[cfg.t,cfg.inc,cfg.f];
   hostPub(me);
   if(isPl(me)){
     begin({mode:'online',my:cw===me.meId?'w':'b',cfg});M.rid=me.rid;
@@ -432,7 +437,7 @@ function roomPeers(me,ch){
     if(me.st&&host.rid>me.rid&&(isPl(me)||isSp(me))){
       me.rid=host.rid;me.started=true;
       if(isPl(me)){
-        begin({mode:'online',my:host.cw===me.meId?'w':'b',cfg:{t:host.cfg[0],inc:host.cfg[1]}});M.rid=me.rid;
+        begin({mode:'online',my:host.cw===me.meId?'w':'b',cfg:{t:host.cfg[0],inc:host.cfg[1],f:host.cfg[2]}});M.rid=me.rid;
         pres({r:me.rid,h:'',ck:null,fin:null});
       }else beginSpec(me);
     }
@@ -474,8 +479,8 @@ function syncPeer(){
 const specName=c=>{const me=on;if(!me)return CN[c];const id=c==='w'?me.cw:me.pl.find(x=>x!==me.cw);return nmOf(me,id,CN[c]);};
 function beginSpec(me){
   UI.reset();
-  const cfg={t:me.cfgp[0]||0,inc:me.cfgp[1]||0};
-  M={mode:'spec',my:'w',lvl:null,cfg,states:[Core.init()],hist:[],moves:[],over:null,busy:false,rid:me.rid,
+  const cfg={t:me.cfgp[0]||0,inc:me.cfgp[1]||0,f:me.cfgp[2]};
+  M={mode:'spec',my:'w',lvl:null,cfg,states:[Core.init(cfg.f!==0)],hist:[],moves:[],over:null,busy:false,rid:me.rid,
      clock:{rem:{w:cfg.t*1000,b:cfg.t*1000},run:cfg.t?'w':null,since:Date.now()}};
   $('menu').hidden=true;$('game').hidden=false;document.documentElement.classList.remove('mn');closeModal();
   UI.mount($('board'));

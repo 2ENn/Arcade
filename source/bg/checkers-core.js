@@ -6,11 +6,11 @@
 const Core=(function(){
   const SQN=i=>'abcdefgh'[i&7]+(8-(i>>3));
   const DIRS=[[-1,-1],[-1,1],[1,-1],[1,1]];
-  function init(){
+  function init(force){
     const b=new Int8Array(64);
     for(let r=0;r<8;r++)for(let c=0;c<8;c++){if((r+c)%2!==1)continue;
       if(r<2)b[r*8+c]=-1;else if(r>5)b[r*8+c]=1;}
-    return{b,t:'w',hm:0};
+    return{b,t:'w',hm:0,f:(force===false||force===0)?0:1}; // f: 1=บังคับกิน 0=ไม่บังคับ (ผู้เล่นเลือกก่อนเริ่ม)
   }
   const own=(p,sg)=>p!==0&&(p>0?1:-1)===sg;
   function jumpsFrom(b,sq,sg,isKing,capd,path,caps,out){
@@ -46,7 +46,7 @@ const Core=(function(){
     return any;
   }
   function legal(s){
-    const sg=s.t==='w'?1:-1,b=s.b,caps=[],steps=[];
+    const sg=s.t==='w'?1:-1,b=s.b,caps=[],steps=[],forced=s.f!==0;
     for(let i=0;i<64;i++){
       const p=b[i];if(!own(p,sg))continue;
       const king=Math.abs(p)===2;
@@ -54,7 +54,7 @@ const Core=(function(){
       const out=[];jumpsFrom(b,i,sg,king,new Set(),[i],[],out);
       b[i]=p;
       for(const m of out)caps.push(m);
-      if(caps.length)continue;
+      if(forced&&caps.length)continue;
       const r=i>>3,c=i&7;
       for(const[dr,dc]of DIRS){
         if(!king&&dr!==-sg)continue;
@@ -62,7 +62,7 @@ const Core=(function(){
         while(rr>=0&&rr<8&&cc>=0&&cc<8&&b[rr*8+cc]===0){steps.push({path:[i,rr*8+cc],caps:[]});if(!king)break;rr+=dr;cc+=dc;}
       }
     }
-    const res=caps.length?caps:steps;
+    const res=forced?(caps.length?caps:steps):caps.concat(steps);
     res.forEach(m=>m.id=m.path.map(SQN).join('-'));
     return res;
   }
@@ -72,7 +72,7 @@ const Core=(function(){
     b[from]=0;for(const c of m.caps)b[c]=0;
     if(wasMan&&((sg===1&&(to>>3)===0)||(sg===-1&&(to>>3)===7)))p=2*sg;
     b[to]=p;
-    return{b,t:s.t==='w'?'b':'w',hm:(m.caps.length||wasMan)?0:s.hm+1};
+    return{b,t:s.t==='w'?'b':'w',hm:(m.caps.length||wasMan)?0:s.hm+1,f:s.f};
   }
   function key(s){let k='';for(let i=0;i<64;i++)k+=String.fromCharCode(66+s.b[i]);return k+s.t;}
   function result(states){

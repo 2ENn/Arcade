@@ -4,6 +4,8 @@ rd=lambda n:open(os.path.join(D,n),encoding='utf8').read()
 import sys;sys.path.insert(0,'/home/claude/emo')
 from build_emo import block
 EMO=block()
+sys.path.insert(0,'/home/claude/bgm')
+from build_bgm import block as BGMB
 HTML='''<!doctype html>
 <html lang="th" class="mn">
 <head>
@@ -33,6 +35,8 @@ HTML='''<!doctype html>
       <div class="lbl">บวกเวลาต่อตา</div><div class="chips" id="cInc"></div>
     </div>
 
+    <div id="ruleBox" hidden><h2>กติกาการกิน</h2><div class="chips" id="cRule"></div><p class="sub" id="ruleHint"></p></div>
+
     <h2>เล่นกับ AI</h2>
     <div class="lbl" style="margin-top:0">คุณเล่นเป็น</div><div class="chips" id="cSide"></div>
     <div id="lvs"></div>
@@ -45,7 +49,7 @@ HTML='''<!doctype html>
   </main>
 
   <section id="game" class="scr" hidden>
-    <div class="gbar"><button class="btn alt" id="bMenu">เมนู</button><div id="status"></div><button class="eye" id="eye" type="button" hidden></button></div>
+    <div class="gbar"><div id="status"></div><button class="eye" id="eye" type="button" hidden></button><button class="btn alt" id="bMenu">เมนู</button></div>
     <div class="pl" style="order:0"><div class="who" id="plTop"></div><div class="clk" id="clkTop"></div></div>
     <div id="bw"><div id="board"></div></div>
     <div class="pl"><div class="who" id="plBot"></div><div class="clk" id="clkBot"></div></div>
@@ -66,6 +70,6 @@ HTML='''<!doctype html>
 '''
 for key,title,theme in [('chess','หมากรุก — Taoob','#8a5a2b'),('checkers','หมากฮอส — Taoob','#2f6b57')]:
     core=rd(key+'-core.js').split('if(typeof module')[0]
-    out=HTML.replace('@THEME@',theme).replace('@TITLE@',title).replace('@COMMONCSS@',rd('common.css')).replace('@GAMECSS@',rd(key+'.css')).replace('@CORE@',core).replace('@UI@',rd(key+'-ui.js')).replace('@COMMON@',rd('common.js')).replace('@EMO@',EMO)
+    out=HTML.replace('@THEME@',theme).replace('@TITLE@',title).replace('@COMMONCSS@',rd('common.css')).replace('@GAMECSS@',rd(key+'.css')).replace('@CORE@',core).replace('@UI@',rd(key+'-ui.js')).replace('@COMMON@',rd('common.js')).replace('@EMO@',EMO+BGMB(key))
     open(os.path.join(D,'..',key+'.html'),'w',encoding='utf8').write(out)
     print(key,len(out))

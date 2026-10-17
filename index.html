@@ -3,134 +3,131 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#101820">
+<meta name="theme-color" content="#0f1720">
 <title>Taoob Arcade</title>
 <meta name="description" content="รวมเกม A-Math, Sudoku และเกม 24 พร้อมบัญชีผู้เล่นและตารางอันดับ">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23101820'/%3E%3Crect x='10' y='10' width='20' height='20' rx='4' fill='%232f9e6a'/%3E%3Crect x='34' y='10' width='20' height='20' rx='4' fill='%2317708f'/%3E%3Crect x='10' y='34' width='20' height='20' rx='4' fill='%23ffcf5a'/%3E%3Crect x='34' y='34' width='20' height='20' rx='4' fill='%23f3eee1'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Sarabun:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Mali:wght@500;700&family=Sarabun:wght@400;500;700&display=swap">
 <style>
-/* Layout: หัวเว็บ + บัญชี → การ์ดเกม 3 ใบ → ตารางอันดับแบบแท็บ; แต่ละเกมใช้สีประจำเกมของตัวเองบนพื้นสีหมึกเข้ม */
+/* หน้าแรก: เรียบ ตัวใหญ่ อ่านง่ายสำหรับเด็กและผู้ใหญ่ — แถบหัวสีเข้มเหมือนทุกหน้าเกม เนื้อหาพื้นสว่าง ปุ่มเล่นใช้สีประจำเกม */
 :root{
-  --bg:#0f1720; --surface:#17222d; --surface2:#1e2d3b; --line:#2a3b4b; --ink:#eaf0f4; --muted:#8aa0b2;
-  --amath:#2f9e6a; --sudoku:#2a9cc2; --g24:#ffcf5a; --chess:#c89b6a; --checkers:#3f9a7c; --accent:#ffcf5a; --accent-ink:#2a2007;
-  --bad:#ff917c; --good:#7bd88f;
-  --f-ui:'Sarabun',system-ui,-apple-system,'Segoe UI',sans-serif;
-  --f-head:'Bricolage Grotesque','Arial Rounded MT Bold','Trebuchet MS',sans-serif;
-  color-scheme:dark;
+  --bg:#d9eefb; --card:#fffdf6; --edge:#10202c; --sh:#10202c; --ink:#13202c; --muted:#52657a; --line:#d8e0e8; --head:#0f1720; --tint:#eaf0f6;
+  --accent:#ffcf5a; --accent-ink:#2a2007; --focus:#1b6dd6; --bad:#b3392a; --good:#1f7a45;
+  --amath:#2f9e6a; --sudoku:#2a9cc2; --g24:#ffcf5a; --chess:#c89b6a; --checkers:#3f9a7c;
+  --f-fun:'Mali','Sarabun',system-ui,sans-serif; --f-ui:'Sarabun',system-ui,-apple-system,'Segoe UI',sans-serif;
+  color-scheme:light dark;
 }
+@media (prefers-color-scheme:dark){:root{--bg:#12303f;--card:#1b2b36;--edge:#eaf0f4;--sh:#050a0e;--ink:#eaf0f4;--muted:#9fb2c3;--line:#2a3b4b;--head:#0b1117;--tint:#1e2d3b;--focus:#ffcf5a;--bad:#ff917c;--good:#7bd88f}}
 [hidden]{display:none!important}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-ui);font-size:15px;line-height:1.5}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-ui);font-size:17px;line-height:1.6}
 a{color:inherit}
 button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
-button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
-.wrap{max-width:720px;margin:0 auto;padding:16px;padding-block:20px 40px;display:flex;flex-direction:column;gap:22px}
-/* navbar */
-.nav{position:sticky;top:0;z-index:20;background:rgba(15,23,32,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top,0px)}
-.nav .in{max-width:720px;margin:0 auto;padding:10px 16px 0;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 12px}
-.nav .links{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;width:100%;order:3;margin:0 -8px;padding:0 8px}
-.nav .links::-webkit-scrollbar{display:none}
-.nav .links a{flex:none;text-decoration:none;color:var(--muted);padding:9px 12px;font-weight:700;border-bottom:3px solid transparent;white-space:nowrap}
-.nav .links a:hover{color:var(--ink)}
-.nav .links a[aria-current=true]{color:var(--ink);border-bottom-color:var(--accent)}
-.nav .links a.ext::after{content:'↗';font-size:11px;margin-left:4px;opacity:.6}
-.nav .logo{text-decoration:none}
-#who{order:2;display:flex;align-items:center;gap:8px}.nav .logo{order:1}
-@media (min-width:640px){.nav .in{max-width:1080px;flex-wrap:nowrap;padding-bottom:0}.nav .links{order:2;width:auto;margin:0;padding:0;flex:1;justify-content:center}#who{order:3}.nav .links a{padding:15px 9px}}
-section[id]{scroll-margin-top:110px}
-@media (min-width:640px){section[id]{scroll-margin-top:70px}}
-html{scroll-behavior:smooth}
-@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
-.logo{font-family:var(--f-head);font-weight:800;font-size:24px;letter-spacing:-.01em;display:flex;align-items:center;gap:10px}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+/* แถบหัว */
+.top{position:sticky;top:0;z-index:20;background:var(--head);color:#eaf0f4;padding-top:env(safe-area-inset-top,0px)}
+.top .in{max-width:760px;margin:0 auto;padding:10px 16px;min-height:60px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:22px;text-decoration:none;color:#eaf0f4;letter-spacing:-.01em}
 .logo i{display:grid;grid-template-columns:1fr 1fr;gap:3px;width:26px;height:26px}
 .logo i b{border-radius:4px;display:block}
 .logo i b:nth-child(1){background:var(--amath)}.logo i b:nth-child(2){background:var(--sudoku)}.logo i b:nth-child(3){background:var(--g24)}.logo i b:nth-child(4){background:#f3eee1}
-#who{min-width:0}
-#who a.wn{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:40vw;text-decoration:none;border-bottom:1px dashed var(--muted)}
-.pn{text-decoration:none}.pn:hover{text-decoration:underline}
-#who span{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:40vw}
-.btn{background:var(--accent);color:var(--accent-ink);border-radius:12px;padding:11px 18px;font-weight:700}
-.btn.alt{background:var(--surface2);color:var(--ink);border:1px solid var(--line)}
-.btn.sm{padding:7px 12px;font-size:14px;border-radius:10px}
+#who{display:flex;align-items:center;gap:8px;min-width:0}
+#who a.wn{color:#eaf0f4;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:46vw;text-decoration:none;border-bottom:2px dashed #8aa0b2;padding:6px 0}
+/* ปุ่ม */
+.btn{display:inline-flex;align-items:center;justify-content:center;background:var(--accent);color:var(--accent-ink);border-radius:14px;padding:12px 20px;min-height:48px;font-weight:700}
+.btn{font-family:var(--f-fun);border:3px solid var(--edge);box-shadow:0 4px 0 var(--sh)}
+.btn:active{transform:translateY(2px);box-shadow:0 2px 0 var(--sh)}
+.btn.alt{background:var(--tint);color:var(--ink);border:1px solid var(--line)}
+.btn.sm{padding:8px 16px;min-height:44px;font-size:16px;border-radius:12px}
 .btn:disabled{opacity:.5}
-h2{font-family:var(--f-head);font-size:22px;margin:0 0 10px;font-weight:800;text-wrap:balance}
+/* โครง */
+.wrap{max-width:760px;margin:0 auto;padding:28px 16px 48px;display:flex;flex-direction:column;gap:32px}
+h1,h2,.logo,.tab{font-family:var(--f-fun)}
+h1{margin:0;font-size:clamp(30px,7vw,42px);line-height:1.2;font-weight:800;text-wrap:balance}
+h2{margin:0 0 6px;font-size:26px;line-height:1.3;font-weight:800}
+.lead{margin:10px 0 0;font-size:19px;color:var(--muted);max-width:34em}
 .sub{color:var(--muted);margin:0}
-.panel{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px}
-/* auth */
-.tabs{display:flex;gap:6px;margin-bottom:14px}
-.tab{flex:1;padding:9px 10px;border-radius:10px;background:var(--surface2);color:var(--muted);font-weight:700;text-align:center}
-.tab[aria-selected=true]{background:var(--accent);color:var(--accent-ink)}
-form{display:flex;flex-direction:column;gap:10px}
-label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted)}
-input{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:11px 12px;width:100%}
-#err{min-height:20px;color:var(--bad);font-size:14px}
-.linkb{align-self:center;color:var(--muted);text-decoration:underline;text-underline-offset:3px;font-size:14px;padding:6px 8px}
-.linkb:hover{color:var(--ink)}
-.rec{display:flex;flex-direction:column;gap:12px}
-.rec .code{font-family:var(--f-head);font-weight:800;font-size:28px;letter-spacing:.08em;text-align:center;background:var(--bg);border:1px dashed var(--accent);border-radius:12px;padding:14px 8px;color:var(--accent);-webkit-user-select:all;user-select:all;word-break:break-all}
-.rec p{margin:0}
-.ok{color:var(--good);font-size:14px;min-height:20px}
-.hint{font-size:12.5px;color:var(--muted);margin:0}
-/* modal */
-.backdrop{position:fixed;inset:0;z-index:50;background:rgba(5,10,15,.72);display:flex;align-items:flex-start;justify-content:center;padding:calc(env(safe-area-inset-top,0px) + 8vh) 16px 16px;overflow:auto}
-.sheet{position:relative;width:100%;max-width:400px;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
-.sheet .x{position:absolute;top:10px;right:10px;width:36px;height:36px;border-radius:10px;color:var(--muted)}
-.sheet .x:hover{background:var(--surface2);color:var(--ink)}
-.guest{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
-.guest p{margin:2px 0 0;font-size:14px}
-.demo{background:rgba(255,207,90,.14);border:1px dashed var(--accent);border-radius:12px;padding:10px 14px;font-size:13.5px;color:var(--ink)}
-/* profile */
-.me{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px;text-align:center}
-.me div{background:var(--bg);border-radius:12px;padding:10px 4px}
-.me b{display:block;font-family:var(--f-head);font-size:24px;font-variant-numeric:tabular-nums}
-.me span{font-size:12px;color:var(--muted)}
-/* games */
-.games{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
-.game{display:flex;flex-direction:column;gap:10px;text-decoration:none;background:var(--surface);border:1px solid var(--line);border-top:4px solid var(--c);border-radius:16px;padding:16px;min-width:0}
-.game:active{background:var(--surface2)}
-.game img{width:56px;height:56px;border-radius:14px}
-.game b{font-family:var(--f-head);font-size:20px}
-.game p{margin:0;color:var(--muted);font-size:14px}
-.game small{color:var(--c);font-weight:700;margin-top:auto;font-variant-numeric:tabular-nums}
-/* leaderboard */
-.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
-.chip{padding:6px 12px;border-radius:999px;background:var(--surface2);border:1px solid var(--line);font-size:14px;color:var(--muted)}
+.steps{list-style:none;margin:18px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:10px 22px}
+.steps li{display:flex;align-items:center;gap:10px;font-weight:700;counter-increment:s}
+.steps{counter-reset:s}
+.steps li::before{content:counter(s);display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--ink);color:var(--bg);font-size:15px;font-weight:800}
+/* บัญชี */
+.panel{background:var(--card);border:3px solid var(--edge);border-radius:22px;box-shadow:0 5px 0 var(--sh);padding:18px 20px}
+.guest{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.guest b{font-size:18px}.guest p{margin:2px 0 0;font-size:16px}
+.me-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.me-head h2{margin:0}
+.me{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px;text-align:center}
+.me div{background:var(--tint);border:2px solid var(--line);border-radius:14px;padding:12px 4px}
+.me b{display:block;font-size:28px;line-height:1.2;font-variant-numeric:tabular-nums}
+.me span{font-size:15px;color:var(--muted)}
+.linkb{color:var(--ink);font-weight:700;text-underline-offset:4px;padding:8px 2px;font-size:16px}
+.demo{background:rgba(255,207,90,.2);border:1px dashed #b98a1c;border-radius:12px;padding:10px 14px;font-size:15px}
+/* กล่องเกม */
+.games{display:grid;grid-template-columns:1fr 1fr;gap:20px 14px;margin-top:18px}
+.game{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;text-decoration:none;background:var(--card);border:3px solid var(--edge);border-radius:22px;box-shadow:0 6px 0 var(--sh);padding:14px 12px 16px;min-width:0;transition:transform .12s}
+.game:nth-child(odd){transform:rotate(-1.2deg)}.game:nth-child(even){transform:rotate(1.2deg)}
+.game:hover,.game:focus-visible{transform:translateY(-3px) rotate(0)}
+.game:last-child{grid-column:1/-1;flex-direction:row;justify-content:center;gap:16px;transform:none;text-align:left}
+.pic{width:100%;max-width:120px;aspect-ratio:1;border-radius:18px;background:var(--c);border:3px solid var(--edge);display:grid;place-items:center;flex:none}
+.pic img{width:78%;height:auto;border-radius:12px}
+.game:last-child .pic{max-width:96px}
+.gt{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0}
+.game:last-child .gt{align-items:flex-start}
+.gt b{font-family:var(--f-fun);font-size:21px;line-height:1.25}
+.gd{font-size:15px;line-height:1.4;color:var(--muted)}
+.gt small{font-size:14px;color:var(--ink);font-weight:700}
+.go{margin-top:2px;background:var(--c);color:#10202c;border:3px solid var(--edge);font-family:var(--f-fun);font-weight:700;font-size:18px;border-radius:999px;padding:4px 26px;min-height:44px;display:inline-flex;align-items:center}
+.game:last-child .go{align-self:center}
+@media (max-width:360px){.games{grid-template-columns:1fr}.game:last-child{flex-direction:column;text-align:center}.game:last-child .gt{align-items:center}}
+@media (prefers-reduced-motion:reduce){.game{transition:none}.btn:active{transform:none}}
+/* อันดับ */
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 4px}
+.chip{padding:8px 16px;min-height:44px;border-radius:999px;background:var(--tint);border:2px solid var(--edge);font-size:16px;color:var(--ink)}
 .chip[aria-selected=true]{background:var(--ink);color:var(--bg);border-color:var(--ink);font-weight:700}
-.scroll{overflow-x:auto}
-table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
-th,td{padding:9px 6px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+.scroll{overflow-x:auto;margin-top:6px}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:17px}
+th,td{padding:12px 8px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
 th:nth-child(2),td:nth-child(2){text-align:left;width:100%;max-width:0;overflow:hidden;text-overflow:ellipsis}
-th:first-child,td:first-child{text-align:center;width:44px}
-th{font-size:12px;color:var(--muted);font-weight:500}
-tr.me-row td{background:rgba(255,207,90,.12);font-weight:700}
-.rk{font-family:var(--f-head);font-weight:800}
-.rk.r1{color:#ffd24a}.rk.r2{color:#d5dde4}.rk.r3{color:#e0996a}
-.empty{padding:22px 0;text-align:center;color:var(--muted)}
-footer{color:var(--muted);font-size:12.5px;text-align:center}
-@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+th:first-child,td:first-child{text-align:center;width:48px}
+th{font-size:14px;color:var(--muted);font-weight:500}
+.pn{text-decoration:none;font-weight:700}.pn:hover{text-decoration:underline}
+tr.me-row td{background:rgba(255,207,90,.25);font-weight:700}
+.rk{font-weight:800}
+.rk.r1{color:#b07d00}.rk.r2{color:#5d6b78}.rk.r3{color:#a0562b}
+@media (prefers-color-scheme:dark){.rk.r1{color:#ffd24a}.rk.r2{color:#d5dde4}.rk.r3{color:#e0996a}}
+.empty{padding:24px 0;text-align:center;color:var(--muted)}
+footer{color:var(--muted);font-size:14px;text-align:center}
+/* หน้าต่างเข้าสู่ระบบ */
+.backdrop{position:fixed;inset:0;z-index:50;background:rgba(5,10,15,.7);display:flex;align-items:flex-start;justify-content:center;padding:calc(env(safe-area-inset-top,0px) + 8vh) 16px 16px;overflow:auto}
+.sheet{position:relative;width:100%;max-width:420px;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.sheet .x{position:absolute;top:10px;right:10px;width:44px;height:44px;border-radius:12px;color:var(--muted);font-size:18px}
+.sheet .x:hover{background:var(--tint);color:var(--ink)}
+.tabs{display:flex;gap:8px;margin:14px 0}
+.tab{flex:1;padding:11px 10px;min-height:48px;border-radius:12px;background:var(--tint);color:var(--muted);font-weight:700;text-align:center}
+.tab[aria-selected=true]{background:var(--accent);color:var(--accent-ink)}
+form{display:flex;flex-direction:column;gap:12px}
+label{display:flex;flex-direction:column;gap:6px;font-size:16px;color:var(--muted)}
+input{font:inherit;font-size:18px;color:var(--ink);background:var(--bg);border:2px solid var(--line);border-radius:12px;padding:12px 14px;min-height:52px;width:100%}
+input:focus{border-color:var(--focus)}
+#err{min-height:22px;color:var(--bad);font-size:16px}
+.hint{font-size:15px;color:var(--muted);margin:0}
+.linkb{align-self:center;background:none;text-decoration:underline;color:var(--muted);font-weight:400}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important;animation:none!important}}
 </style>
 </head>
 <body>
-<header class="nav">
+<header class="top">
   <div class="in">
-    <a class="logo" href="#top" aria-label="Taoob Arcade หน้าแรก"><i><b></b><b></b><b></b><b></b></i>Taoob Arcade</a>
+    <a class="logo" href="./" aria-label="Taoob Arcade หน้าแรก"><i><b></b><b></b><b></b><b></b></i>Taoob Arcade</a>
     <div id="who"><button class="btn sm" id="bIn">เข้าสู่ระบบ</button></div>
-    <nav class="links" id="navLinks" aria-label="เมนูหลัก">
-      <a href="#top" data-s="top" aria-current="true">หน้าแรก</a>
-      <a href="#games" data-s="games">เกม</a>
-      <a href="#ranking" data-s="ranking">อันดับ</a>
-      <a href="amath/" class="ext">A-Math</a>
-      <a href="sudoku/" class="ext">Sudoku</a>
-      <a href="game24/" class="ext">เกม 24</a>
-      <a href="chess/" class="ext">หมากรุก</a>
-      <a href="checkers/" class="ext">หมากฮอส</a>
-    </nav>
+    <nav id="navLinks" hidden></nav>
   </div>
 </header>
-<div class="wrap" id="top">
-
+<main class="wrap" id="top">
   <div class="backdrop" id="auth" hidden>
   <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="amTitle">
     <button class="x" id="bClose" aria-label="ปิด">✕</button>
@@ -150,41 +147,43 @@ footer{color:var(--muted);font-size:12.5px;text-align:center}
     </form>
   </div>
 </div>
-<section class="panel guest" id="guestBox" hidden aria-label="ยังไม่ได้เข้าสู่ระบบ">
-  <div><b>ยังไม่ได้เข้าสู่ระบบ</b><p class="sub">เล่นได้เลย แต่ผลจะติดอันดับเมื่อเข้าสู่ระบบ</p></div>
-  <button class="btn sm" id="bIn2">เข้าสู่ระบบ</button>
-</section>
-<div class="demo" id="demoBar" hidden>โหมดทดลอง: บัญชีและอันดับเก็บในเครื่องนี้เท่านั้น มีผู้เล่นตัวอย่างให้ดูหน้าตา ของจริงจะเชื่อม Supabase</div>
 
-  <section class="panel" id="meBox" hidden aria-label="โปรไฟล์ของฉัน">
-    <h2 style="margin:0">สวัสดี <span id="meName"></span></h2>
-    <div class="me"><div><b id="meRank">–</b><span>อันดับรวม</span></div><div><b id="mePts">0</b><span>แต้มรวม</span></div><div><b id="meWins">0</b><span>ชนะ</span></div></div>
-    <a class="linkb" href="profile/" style="margin-top:10px">ดูสถิติทั้งหมดของฉัน →</a>
+    <section class="panel guest" id="guestBox" hidden aria-label="ยังไม่ได้เข้าสู่ระบบ">
+    <div><b>เข้าสู่ระบบเพื่อให้คะแนนติดอันดับ</b><p class="sub">ถ้ายังไม่เข้าสู่ระบบ ก็เล่นได้เหมือนกัน แต่คะแนนจะไม่ถูกบันทึก</p></div>
+    <button class="btn" id="bIn2">เข้าสู่ระบบ</button>
+  </section>
+  <div class="demo" id="demoBar" hidden>โหมดทดลอง: บัญชีและอันดับเก็บในเครื่องนี้เท่านั้น มีผู้เล่นตัวอย่างให้ดูหน้าตา ของจริงจะเชื่อม Supabase</div>
+
+  <section class="panel" id="meBox" hidden aria-label="ของฉัน">
+    <div class="me-head"><h2>สวัสดี <span id="meName"></span></h2><a class="linkb" href="profile/">ดูสถิติของฉัน</a></div>
+    <div class="me"><div><b id="meRank">–</b><span>อันดับรวม</span></div><div><b id="mePts">0</b><span>แต้มรวม</span></div><div><b id="meWins">0</b><span>ครั้งที่ชนะ</span></div></div>
   </section>
 
-  <section id="games" aria-label="เกม">
-    <h2>เกม</h2>
+  <section id="games" aria-labelledby="gh">
+    <h2 id="gh">เกมทั้งหมด</h2>
+    <p class="sub">แตะกล่องที่ชอบ ทุกเกมมีระดับง่ายถึงยาก</p>
     <div class="games">
-      <a class="game" style="--c:var(--amath)" href="amath/"><img src="icons/amath.png" alt=""><b>A-Math</b><p>เรียงสมการลงกระดาน สู้กับ AI หรือเพื่อน</p><small id="gm-amath"></small></a>
-      <a class="game" style="--c:var(--sudoku)" href="sudoku/"><img src="icons/sudoku.png" alt=""><b>Sudoku</b><p>4 ระดับ มีโน้ต ใบ้ และแข่งกับเพื่อน</p><small id="gm-sudoku"></small></a>
-      <a class="game" style="--c:var(--g24)" href="game24/"><img src="icons/game24.png" alt=""><b>เกม 24</b><p>ใช้ไพ่ 4 ใบให้ได้ 24 เล่นเดี่ยวหรือแข่งกัน</p><small id="gm-game24"></small></a>
-      <a class="game" style="--c:var(--chess)" href="chess/"><img src="icons/chess.png" alt=""><b>หมากรุก</b><p>หมากรุกสากล สู้ AI เพื่อน หรือออนไลน์ มีนาฬิกา</p><small id="gm-chess"></small></a>
-      <a class="game" style="--c:var(--checkers)" href="checkers/"><img src="icons/checkers.png" alt=""><b>หมากฮอส</b><p>หมากฮอสไทย ฮอสบินได้ มีนาฬิกา เล่นออนไลน์ได้</p><small id="gm-checkers"></small></a>
+      <a class="game" style="--c:var(--g24)" href="game24/"><span class="pic"><img src="icons/game24.png" alt=""></span><span class="gt"><b>เกม 24</b><span class="gd">ใช้ไพ่ 4 ใบ ให้ได้ 24</span><small id="gm-game24"></small></span><span class="go">เล่น</span></a>
+      <a class="game" style="--c:var(--sudoku)" href="sudoku/"><span class="pic"><img src="icons/sudoku.png" alt=""></span><span class="gt"><b>Sudoku</b><span class="gd">เติมเลข 1–9 ไม่ซ้ำกัน</span><small id="gm-sudoku"></small></span><span class="go">เล่น</span></a>
+      <a class="game" style="--c:var(--amath)" href="amath/"><span class="pic"><img src="icons/amath.png" alt=""></span><span class="gt"><b>A-Math</b><span class="gd">เรียงเลขให้เป็นสมการ</span><small id="gm-amath"></small></span><span class="go">เล่น</span></a>
+      <a class="game" style="--c:var(--checkers)" href="checkers/"><span class="pic"><img src="icons/checkers.png" alt=""></span><span class="gt"><b>หมากฮอส</b><span class="gd">กินหมากให้หมดกระดาน</span><small id="gm-checkers"></small></span><span class="go">เล่น</span></a>
+      <a class="game" style="--c:var(--chess)" href="chess/"><span class="pic"><img src="icons/chess.png" alt=""></span><span class="gt"><b>หมากรุก</b><span class="gd">วางแผนให้รุกฆาต</span><small id="gm-chess"></small></span><span class="go">เล่น</span></a>
     </div>
   </section>
 
-  <section id="ranking" aria-label="ตารางอันดับ">
-    <h2>ตารางอันดับ</h2>
-    <div class="panel">
-      <div class="chips" id="gTabs" role="tablist"></div>
-      <div class="chips" id="cTabs" role="tablist"></div>
-      <p class="sub" id="lbNote" style="margin-bottom:6px"></p>
+  <section id="ranking" aria-labelledby="rh">
+    <h2 id="rh">ตารางอันดับ</h2>
+    <p class="sub">เลือกเกมเพื่อดูว่าใครเก่งที่สุด ชื่อผู้เล่นกดดูสถิติได้</p>
+    <div class="panel" style="margin-top:12px">
+      <div class="chips" id="gTabs" role="tablist" aria-label="เลือกเกม"></div>
+      <div class="chips" id="cTabs" role="tablist" aria-label="เลือกระดับ"></div>
+      <p class="sub" id="lbNote" style="margin:8px 0 4px;font-size:15px"></p>
       <div class="scroll"><table><thead id="lbHead"></thead><tbody id="lbBody"></tbody></table></div>
       <div class="empty" id="lbEmpty" hidden></div>
     </div>
   </section>
-  <footer>ผลที่ส่งจากเกมไม่ได้ผ่านการตรวจสอบฝั่งเซิร์ฟเวอร์ ใช้เพื่อความสนุกระหว่างเพื่อนๆ</footer>
-</div>
+  <footer>คะแนนไม่ได้ผ่านการตรวจสอบจากเซิร์ฟเวอร์ ใช้เพื่อความสนุกระหว่างเพื่อนๆ</footer>
+</main>
 <script src="platform.js"></script>
 <script>
 (function(){

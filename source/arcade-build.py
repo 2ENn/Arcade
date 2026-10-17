@@ -13,33 +13,60 @@ SHARE = "if(!client)client=(window.Arcade&&window.Arcade.client&&window.Arcade.c
 SHARE_A = "if (!client) client = (window.Arcade && window.Arcade.client && window.Arcade.client()) || window.supabase.createClient("
 
 NAVCSS = """<style id="gnavcss">
-#gnav{--line:#2a3b4b;--ink:#eaf0f4;--muted:#8aa0b2;--accent:#ffcf5a;--accent-ink:#2a2007;--surface2:#1e2d3b;
-position:sticky;top:0;z-index:50;flex:none;width:100%;box-sizing:border-box;background:rgba(15,23,32,.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top,0px);color:var(--ink);font:15px/1.5 'Sarabun',system-ui,-apple-system,'Segoe UI',sans-serif;text-align:left}
+/* แถบบางสไตล์กล่องเกม: ปุ่มกลับหน้าแรก + ชื่อผู้ใช้ เท่านั้น */
+#gnav{--nbg:#d9eefb;--edge:#10202c;--sh:#10202c;--ink:#10202c;--accent:#ffcf5a;--accent-ink:#2a2007;--card:#fffdf6;
+position:sticky;top:0;z-index:50;flex:none;width:100%;box-sizing:border-box;background:var(--nbg);border-bottom:3px solid var(--edge);padding-top:env(safe-area-inset-top,0px);color:var(--ink);font:16px/1.4 'Sarabun',system-ui,-apple-system,'Segoe UI',sans-serif;text-align:left}
+@media (prefers-color-scheme:dark){#gnav{--nbg:#12303f;--edge:#eaf0f4;--sh:#050a0e;--ink:#eaf0f4;--card:#1b2b36}}
 #gnav *{box-sizing:border-box}
-#gnav .gin{max-width:720px;margin:0 auto;padding:10px 16px 0;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 12px}
-#gnav .glogo{order:1;text-decoration:none;color:var(--ink);font-family:'Bricolage Grotesque','Arial Rounded MT Bold','Trebuchet MS',sans-serif;font-weight:800;font-size:24px;letter-spacing:-.01em;display:flex;align-items:center;gap:10px}
-#gnav .glogo i{display:grid;grid-template-columns:1fr 1fr;gap:3px;width:26px;height:26px}
-#gnav .glogo i b{border-radius:4px;display:block}
-#gnav .glogo i b:nth-child(1){background:#2f9e6a}#gnav .glogo i b:nth-child(2){background:#2a9cc2}#gnav .glogo i b:nth-child(3){background:#ffcf5a}#gnav .glogo i b:nth-child(4){background:#f3eee1}
-#gnav #gwho{order:2;display:flex;align-items:center;gap:8px;min-width:0}
-#gnav #gwho a.gname{color:var(--ink);text-decoration:none;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:40vw;border-bottom:1px dashed var(--muted)}
-#gnav #gwho span{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:40vw}
-#gnav .gbtn{background:var(--accent);color:var(--accent-ink);border-radius:10px;padding:7px 12px;font:700 14px 'Sarabun',system-ui,sans-serif;text-decoration:none;border:0;cursor:pointer;display:inline-block}
-#gnav .gbtn.alt{background:var(--surface2);color:var(--ink);border:1px solid var(--line)}
-#gnav .glinks{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;width:100%;order:3;margin:0 -8px;padding:0 8px}
-#gnav .glinks::-webkit-scrollbar{display:none}
-#gnav .glinks a{flex:none;text-decoration:none;color:var(--muted);padding:9px 12px;font-weight:700;border-bottom:3px solid transparent;white-space:nowrap}
-#gnav .glinks a:hover{color:var(--ink)}
-#gnav .glinks a[aria-current]{color:var(--ink);border-bottom-color:var(--accent)}
-#gnav a:focus-visible,#gnav button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
-@media (min-width:640px){#gnav .gin{max-width:1080px;flex-wrap:nowrap;padding-bottom:0}#gnav .glinks{order:2;width:auto;margin:0;padding:0;flex:1;justify-content:center}#gnav #gwho{order:3}#gnav .glinks a{padding:15px 9px}}
+#gnav .gin{max-width:720px;margin:0 auto;padding:8px 16px 10px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+#gnav .ghome{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:4px 16px;border-radius:999px;background:var(--accent);color:var(--accent-ink);border:3px solid var(--edge);box-shadow:0 3px 0 var(--sh);font:700 17px 'Mali','Sarabun',system-ui,sans-serif;text-decoration:none;white-space:nowrap}
+#gnav .ghome:active{transform:translateY(2px);box-shadow:0 1px 0 var(--sh)}
+#gnav #gwho{display:flex;align-items:center;gap:8px;min-width:0}
+#gnav #gwho a.gname{color:var(--ink);text-decoration:none;font:700 17px 'Mali','Sarabun',sans-serif;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:42vw;border-bottom:2px dashed var(--ink);padding:4px 0}
+#gnav .gbtn{background:var(--card);color:var(--ink);border:3px solid var(--edge);box-shadow:0 3px 0 var(--sh);border-radius:999px;padding:4px 16px;min-height:44px;display:inline-flex;align-items:center;font:700 16px 'Mali','Sarabun',system-ui,sans-serif;text-decoration:none}
+#gnav a:focus-visible,#gnav button:focus-visible{outline:3px solid #1b6dd6;outline-offset:2px}
 #gnav~.ov:not(.dim),.ov:not(.dim){top:var(--gnh,0px)!important}.ov.dim{z-index:60!important}
+/* เมนูและสถิติ (แผ่นเลื่อนขึ้น) */
+#gmenu{--nbg:#d9eefb;--edge:#10202c;--sh:#10202c;--ink:#10202c;--muted:#52657a;--card:#fffdf6;--tint:#e9eff5;--accent:#ffcf5a;--accent-ink:#2a2007;
+position:fixed;inset:0;z-index:99990;background:rgba(5,10,15,.6);display:flex;align-items:flex-end;justify-content:center;font:16px/1.45 'Sarabun',system-ui,-apple-system,'Segoe UI',sans-serif;color:var(--ink)}
+@media (prefers-color-scheme:dark){#gmenu{--nbg:#12303f;--edge:#eaf0f4;--sh:#050a0e;--ink:#eaf0f4;--muted:#9fb2c3;--card:#1b2b36;--tint:#24394a}}
+#gmenu[hidden]{display:none}
+#gmenu *{box-sizing:border-box}
+#gmenu .gm-box{width:100%;max-width:520px;max-height:88vh;max-height:88dvh;overflow:auto;background:var(--nbg);border:3px solid var(--edge);border-bottom:0;border-radius:26px 26px 0 0;padding:16px 16px calc(18px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:14px}
+@media (min-width:600px){#gmenu{align-items:center}#gmenu .gm-box{border-bottom:3px solid var(--edge);border-radius:26px;box-shadow:0 8px 0 var(--sh)}}
+#gmenu .gm-top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+#gmenu .gm-who{min-width:0;font:700 20px 'Mali','Sarabun',sans-serif;line-height:1.3}
+#gmenu .gm-who a{color:var(--ink);text-decoration:none;border-bottom:2px dashed var(--ink)}
+#gmenu .gm-who small{display:block;font:400 14px 'Sarabun',sans-serif;color:var(--muted)}
+#gmenu .gm-x{flex:none;width:44px;height:44px;border-radius:50%;border:3px solid var(--edge);background:var(--card);color:var(--ink);box-shadow:0 3px 0 var(--sh);font-size:18px;cursor:pointer}
+#gmenu .gm-card{background:var(--card);border:3px solid var(--edge);border-radius:20px;box-shadow:0 4px 0 var(--sh);padding:14px}
+#gmenu .gm-h{font:700 18px 'Mali','Sarabun',sans-serif;margin:0 0 8px}
+#gmenu .gm-tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}
+#gmenu .gm-tiles div{background:var(--tint);border-radius:12px;padding:8px 4px}
+#gmenu .gm-tiles b{display:block;font:700 24px/1.2 'Mali','Sarabun',sans-serif;font-variant-numeric:tabular-nums}
+#gmenu .gm-tiles span{font-size:14px;color:var(--muted)}
+#gmenu .gm-rows{margin-top:10px;display:flex;flex-direction:column;font-variant-numeric:tabular-nums}
+#gmenu .gm-rows div{display:flex;justify-content:space-between;gap:10px;padding:7px 2px;border-top:1px solid var(--tint);font-size:15px}
+#gmenu .gm-rows div span:last-child{color:var(--muted);text-align:right}
+#gmenu .gm-note{margin:8px 0 0;color:var(--muted);font-size:14px}
+#gmenu .gm-games{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+#gmenu .gm-games a{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;text-decoration:none;color:var(--ink);font:700 15px/1.25 'Mali','Sarabun',sans-serif;background:var(--card);border:3px solid var(--edge);border-radius:16px;box-shadow:0 3px 0 var(--sh);padding:10px 4px}
+#gmenu .gm-games a img{width:48px;height:48px;border-radius:12px;background:var(--c);border:2px solid var(--edge)}
+#gmenu .gm-games a[aria-current]{background:var(--c);color:#10202c;box-shadow:none;transform:translateY(3px)}
+#gmenu .gm-links{display:flex;flex-wrap:wrap;gap:8px}
+#gmenu .gm-links a{flex:1 1 auto;text-align:center;text-decoration:none;color:var(--ink);font:700 16px 'Mali','Sarabun',sans-serif;background:var(--card);border:3px solid var(--edge);border-radius:999px;box-shadow:0 3px 0 var(--sh);padding:6px 14px;min-height:44px;display:inline-flex;align-items:center;justify-content:center}
+#gmenu .gm-links a.pri{background:var(--accent);color:var(--accent-ink)}
+#gmenu a:focus-visible,#gmenu button:focus-visible,#gnav button:focus-visible{outline:3px solid #1b6dd6;outline-offset:2px}
+@media (prefers-reduced-motion:no-preference){#gmenu .gm-box{animation:gmUp .18s ease-out}@keyframes gmUp{from{transform:translateY(24px);opacity:.4}}}
+
+/* แผงเมนูในเกม: สไตล์กล่องเกมเหมือนกัน */
 </style>
 """
 
 PROFILE_BODY = r'''
 <style>
-:root{--bg:#0f1720;--surface:#17222d;--surface2:#1e2d3b;--line:#2a3b4b;--ink:#eaf0f4;--muted:#8aa0b2;--accent:#ffcf5a;--accent-ink:#2a2007;--good:#7bd88f;--f-ui:'Sarabun',system-ui,-apple-system,'Segoe UI',sans-serif;--f-head:'Bricolage Grotesque','Arial Rounded MT Bold','Trebuchet MS',sans-serif;color-scheme:dark}
+:root{--bg:#d9eefb;--surface:#fffdf6;--surface2:#e9eff5;--line:#c5d2de;--edge:#10202c;--sh:#10202c;--ink:#13202c;--muted:#52657a;--accent:#ffcf5a;--accent-ink:#2a2007;--good:#1f7a45;--f-ui:'Sarabun',system-ui,-apple-system,'Segoe UI',sans-serif;--f-head:'Mali','Sarabun',system-ui,sans-serif}
+@media (prefers-color-scheme:dark){:root{--bg:#12303f;--surface:#1b2b36;--surface2:#24394a;--line:#2f4658;--edge:#eaf0f4;--sh:#050a0e;--ink:#eaf0f4;--muted:#9fb2c3;--good:#7bd88f;color-scheme:dark}}
 *{box-sizing:border-box}[hidden]{display:none!important}
 html,body{margin:0}body{background:var(--bg);color:var(--ink);font-family:var(--f-ui);font-size:15px;line-height:1.5;min-height:100vh}
 a{color:inherit}
@@ -74,6 +101,16 @@ tr:last-child td{border-bottom:0}
 .btn{display:inline-block;background:var(--accent);color:var(--accent-ink);border-radius:12px;padding:11px 18px;font-weight:700;text-decoration:none}
 .sub{color:var(--muted);margin:0 0 12px}
 .err{color:#ff917c;text-align:center}
+.tile{border:3px solid var(--edge);border-radius:18px;box-shadow:0 4px 0 var(--sh)}
+.gp{border:3px solid var(--edge);border-top:3px solid var(--edge);border-radius:22px;box-shadow:0 5px 0 var(--sh);padding:16px}
+.gh img{border:3px solid var(--edge);background:var(--c);border-radius:14px;padding:2px}
+.gh a.go{color:#10202c;background:var(--c);border:3px solid var(--edge);border-radius:999px;padding:3px 18px;min-height:40px;display:inline-flex;align-items:center;font-family:var(--f-head)}
+.gh a.go:hover{text-decoration:none}
+.av{border:3px solid var(--edge);box-shadow:0 4px 0 var(--sh);font-family:var(--f-head)}
+.panel{border:3px solid var(--edge);border-radius:22px;box-shadow:0 5px 0 var(--sh)}
+.btn{border:3px solid var(--edge);box-shadow:0 4px 0 var(--sh);font-family:var(--f-head);font-weight:700}
+.btn.out{background:var(--surface);color:var(--ink);border:3px solid var(--edge);box-shadow:0 3px 0 var(--sh);font-family:var(--f-head);min-height:44px}
+body{font-size:16px}
 </style>
 <main class="pw" id="pw">
   <div id="guest" class="panel" hidden><h2>โปรไฟล์ของฉัน</h2><p class="sub">เข้าสู่ระบบเพื่อดูสถิติของตัวเอง</p><a class="btn" href="../#login">เข้าสู่ระบบ</a></div>
@@ -156,9 +193,9 @@ def NAV(cur):
         extra = '<style>#toast{top:calc(var(--gnh,0px) + 10px)!important;z-index:70!important}</style>'
     elif cur == 'amath':
         extra = '<style>#toast.top{top:calc(var(--gnh,0px) + 8px)!important}</style>'
-    return NAVCSS + extra + ('<div id="gnav" role="banner"><div class="gin"><a class="glogo" href="../" aria-label="Taoob Arcade หน้าแรก"><i><b></b><b></b><b></b><b></b></i>Taoob Arcade</a>'
-        '<div id="gwho"><a class="gbtn" href="../#login">เข้าสู่ระบบ</a></div>'
-        '<nav class="glinks" aria-label="เมนูหลัก">' + links + '</nav></div></div>\n')
+    home = '<a class="ghome" href="../" aria-label="กลับหน้าแรก"><span aria-hidden="true">←</span>หน้าแรก</a>'
+    return NAVCSS + extra + ('<div id="gnav" role="banner" data-game="%s"><div class="gin">' % cur + home +
+        '<div id="gwho"><button type="button" class="gbtn" id="gmBtn" aria-haspopup="dialog">เมนู</button></div></div></div>\n')
 
 ACCT_JS = '''<script>
 (function(){
@@ -178,7 +215,7 @@ ACCT_JS = '''<script>
   }
   function guard(){try{return window.__leaveGuard?window.__leaveGuard():null;}catch(e){return null;}}
   document.addEventListener('click',function(e){
-    var a=e.target.closest&&e.target.closest('#gnav a[href]'),o=e.target.closest&&e.target.closest('#gOut');
+    var a=e.target.closest&&e.target.closest('#gnav a[href],#gmenu a[href],.gm-embed a[href]'),o=e.target.closest&&e.target.closest('#gOut');
     if(!a&&!o)return;if(a&&(e.ctrlKey||e.metaKey||e.shiftKey||a.target==='_blank'))return;
     var g=guard();if(!g)return;
     e.preventDefault();e.stopImmediatePropagation();
@@ -186,12 +223,63 @@ ACCT_JS = '''<script>
   },true);
   addEventListener('beforeunload',function(e){var g=guard();if(g&&!g.soft){e.preventDefault();e.returnValue='';}});
   var el=document.getElementById('gwho');if(!el||!window.Arcade)return;
-  var f=document.createElement('link');f.rel='stylesheet';f.href='https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=Sarabun:wght@400;700&display=swap';document.head.appendChild(f);
-  Arcade.onChange(function(u){
-    if(!u){el.innerHTML='<a class="gbtn" href="../#login">เข้าสู่ระบบ</a>';return;}
-    el.innerHTML='<a class="gname" href="../profile/" title="ดูโปรไฟล์/สถิติของฉัน"></a>';
-    el.firstChild.textContent=u.username;
-  });
+  var f=document.createElement('link');f.rel='stylesheet';f.href='https://fonts.googleapis.com/css2?family=Mali:wght@500;700&family=Sarabun:wght@400;700&display=swap';document.head.appendChild(f);
+  var cur=(nv&&nv.getAttribute('data-game'))||'';
+  var GM=[['game24','เกม 24','#ffcf5a'],['sudoku','Sudoku','#2a9cc2'],['amath','A-Math','#2f9e6a'],['checkers','หมากฮอส','#3f9a7c'],['chess','หมากรุก','#c89b6a']];
+  var LV={easy:'ง่าย',medium:'กลาง',hard:'ยาก',expert:'โหด',online:'แข่งกับเพื่อน'},AIL={easy:'สู้ AI ง่าย',medium:'สู้ AI กลาง',hard:'สู้ AI ยาก',online:'แข่งกับเพื่อน'};
+  var AI={chess:1,checkers:1,amath:1},STAT={amath:'score',sudoku:'time',game24:'time'},ORDER=['easy','medium','hard','expert','online'];
+  function esc(x){return String(x).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+  function fmtT(t){t=+t;if(t>=60){var m=Math.floor(t/60),s=Math.round(t-m*60);if(s===60){m++;s=0;}return m+':'+(s<10?'0':'')+s+' น.';}return t.toFixed(1)+' วิ';}
+  var gg='';GM.forEach(function(g){gg+='<a href="../'+g[0]+'/" style="--c:'+g[2]+'"'+(g[0]===cur?' aria-current="page"':'')+'><img src="../icons/'+g[0]+'.png" alt="">'+g[1]+'</a>';});
+  var BODY='<div class="gm-who gmWho"></div><div class="gmStats"></div><div class="gm-card"><div class="gm-h">เล่นเกมอื่น</div><div class="gm-games">'+gg+'</div></div><div class="gm-links"><a class="pri" href="../">หน้าแรก</a><a href="../#ranking">ตารางอันดับ</a><a href="../profile/">โปรไฟล์ของฉัน</a></div>';
+  var box=document.createElement('div');box.id='gmenu';box.hidden=true;
+  box.innerHTML='<div class="gm-box" role="dialog" aria-modal="true" aria-label="เมนู"><div class="gm-top"><span class="gm-h" style="margin:0">เมนู</span><button type="button" class="gm-x" id="gmX" aria-label="ปิดเมนู">✕</button></div>'+BODY+'</div>';
+  document.body.appendChild(box);
+  var opener=null;
+  function closeM(){box.hidden=true;if(opener&&opener.focus)try{opener.focus();}catch(e){}}
+  function openM(){opener=document.activeElement;box.hidden=false;paint(box);box.querySelector('#gmX').focus();}
+  window.__gmenuOpen=openM;
+  box.querySelector('#gmX').onclick=closeM;
+  box.addEventListener('mousedown',function(e){if(e.target===box)closeM();});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!box.hidden&&!document.getElementById('gleave'))closeM();});
+  el.addEventListener('click',function(e){if(e.target.closest('#gmBtn'))openM();});
+  var tok=0,U=null;
+  function paint(root){
+    var who=root.querySelector('.gmWho'),st=root.querySelector('.gmStats'),my=++tok;
+    if(!U){
+      who.innerHTML='ยังไม่ได้เข้าสู่ระบบ<small>เล่นได้ แต่ผลจะไม่ติดอันดับ</small>';
+      st.innerHTML='<div class="gm-card"><div class="gm-h">สถิติของฉัน</div><p class="gm-note" style="margin:0 0 10px">เข้าสู่ระบบเพื่อเก็บสถิติและติดอันดับ</p><div class="gm-links"><a class="pri" href="../#login">เข้าสู่ระบบ</a></div></div>';
+      return;
+    }
+    who.innerHTML='สวัสดี <a href="../profile/">'+esc(U.username)+'</a><small>แตะชื่อเพื่อดูสถิติทั้งหมด</small>';
+    st.innerHTML='<div class="gm-card"><div class="gm-h">สถิติของฉัน</div><p class="gm-note" style="margin:0">กำลังโหลด…</p></div>';
+    Promise.all([Arcade.userRows(U.username),Arcade.overall()]).then(function(r){
+      if(my!==tok||!U)return;
+      var rows=r[0],ov=r[1].filter(function(x){return x.plays>0;}).sort(function(a,b){return b.points-a.points||b.wins-a.wins||(a.username<b.username?-1:1);});
+      var i=ov.findIndex(function(x){return x.username===U.username;}),me=ov[i]||{points:0,wins:0,plays:0};
+      var line='อันดับรวม '+(i>=0?'#'+(i+1):'–')+' · '+(me.points||0)+' แต้ม';
+      var gname='';GM.forEach(function(g){if(g[0]===cur)gname=g[1];});
+      var h;
+      if(gname){
+        var rs=rows.filter(function(x){return x.game===cur&&x.plays>0;}),w=0,p=0;rs.forEach(function(x){w+=x.wins;p+=x.plays;});
+        h='<div class="gm-card"><div class="gm-h">สถิติของฉัน: '+esc(gname)+'</div>';
+        if(!p)h+='<p class="gm-note" style="margin:0">ยังไม่เคยเล่นเกมนี้ ลองเล่นรอบแรกได้เลย</p>';
+        else{
+          h+='<div class="gm-tiles"><div><b>'+w+'</b><span>ชนะ</span></div><div><b>'+p+'</b><span>เล่น</span></div><div><b>'+Math.round(100*w/p)+'%</b><span>อัตราชนะ</span></div></div><div class="gm-rows">';
+          var lbl=AI[cur]?AIL:LV;
+          ORDER.forEach(function(c){var x=rs.filter(function(y){return y.cat===c;})[0];if(!x)return;
+            var ex=STAT[cur]==='time'&&c!=='online'?(x.best_time!=null?'เร็วสุด '+fmtT(x.best_time):''):STAT[cur]==='score'&&x.best_score!=null?'สูงสุด '+x.best_score:'';
+            h+='<div><span>'+(lbl[c]||c)+'</span><span>ชนะ '+x.wins+'/'+x.plays+(ex?' · '+ex:'')+'</span></div>';});
+          h+='</div>';
+        }
+        h+='<p class="gm-note">'+line+'</p></div>';
+      }else{
+        h='<div class="gm-card"><div class="gm-h">ภาพรวมของฉัน</div><div class="gm-tiles"><div><b>'+(i>=0?'#'+(i+1):'–')+'</b><span>อันดับรวม</span></div><div><b>'+(me.points||0)+'</b><span>แต้ม</span></div><div><b>'+(me.wins||0)+'</b><span>ชนะ</span></div></div></div>';
+      }
+      st.innerHTML=h;
+    },function(){if(my===tok)st.innerHTML='<div class="gm-card"><div class="gm-h">สถิติของฉัน</div><p class="gm-note" style="margin:0">โหลดสถิติไม่ได้ ลองใหม่อีกครั้ง</p></div>';});
+  }
+  Arcade.onChange(function(u){U=u;if(!box.hidden)paint(box);});
 })();
 </script>
 '''

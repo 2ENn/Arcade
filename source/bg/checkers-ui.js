@@ -61,7 +61,7 @@ const UI=(function(){
   function lastSqs(m){return[m.path[0],m.path[m.path.length-1]];}
   function cap(s){let w=0,b=0,wk=0,bk=0;for(let i=0;i<64;i++){const p=s.b[i];if(p>0){w++;if(p===2)wk++;}else if(p<0){b++;if(p===-2)bk++;}}
     return{w:'เหลือ '+w+(wk?' (ฮอส '+wk+')':''),b:'เหลือ '+b+(bk?' (ฮอส '+bk+')':'')};}
-  function statusExtra(s){if(part.length>1)return 'กดช่องถัดไปเพื่อกินต่อ';const l=Core.legal(s);return l.length&&l[0].caps.length?'ต้องกิน':'';}
+  function statusExtra(s){if(part.length>1)return 'กดช่องถัดไปเพื่อกินต่อ';const l=Core.legal(s);return l.some(m=>m.caps.length)?(s.f===0?'กินได้ (ไม่บังคับ)':'ต้องกิน'):'';}
   const icon='<svg viewBox="0 0 64 64"><rect width="64" height="64" fill="#2f6b57"/><g fill="#e8d9b5"><rect x="0" y="0" width="16" height="16"/><rect x="32" y="0" width="16" height="16"/><rect x="16" y="16" width="16" height="16"/><rect x="48" y="16" width="16" height="16"/><rect x="0" y="32" width="16" height="16"/><rect x="32" y="32" width="16" height="16"/><rect x="16" y="48" width="16" height="16"/><rect x="48" y="48" width="16" height="16"/></g><circle cx="24" cy="24" r="10" fill="#2b1f1c" stroke="#6b5550" stroke-width="2"/><circle cx="40" cy="40" r="10" fill="#f6efe0" stroke="#bda97c" stroke-width="2"/></svg>';
   return{key:'checkers',name:'หมากฮอส',sub:'หมากฮอสไทย เล่นกับ AI เพื่อน หรือออนไลน์',icon,
     rule:'ตัวธรรมดาเดิน/กินเฉียงไปข้างหน้า · ถึงแถวสุดท้ายเป็นฮอส เดิน/กินเฉียงได้ทุกทิศไกลกี่ช่องก็ได้ · บังคับกิน',

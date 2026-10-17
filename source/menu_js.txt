@@ -1,0 +1,68 @@
+  var el=document.getElementById('gwho');if(!el||!window.Arcade)return;
+  var f=document.createElement('link');f.rel='stylesheet';f.href='https://fonts.googleapis.com/css2?family=Mali:wght@500;700&family=Sarabun:wght@400;700&display=swap';document.head.appendChild(f);
+  var cur=(nv&&nv.getAttribute('data-game'))||'';
+  var GM=[['game24','เกม 24','#ffcf5a'],['sudoku','Sudoku','#2a9cc2'],['amath','A-Math','#2f9e6a'],['checkers','หมากฮอส','#3f9a7c'],['chess','หมากรุก','#c89b6a']];
+  var LV={easy:'ง่าย',medium:'กลาง',hard:'ยาก',expert:'โหด',online:'แข่งกับเพื่อน'},AIL={easy:'สู้ AI ง่าย',medium:'สู้ AI กลาง',hard:'สู้ AI ยาก',online:'แข่งกับเพื่อน'};
+  var AI={chess:1,checkers:1,amath:1},STAT={amath:'score',sudoku:'time',game24:'time'},ORDER=['easy','medium','hard','expert','online'];
+  function esc(x){return String(x).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+  function fmtT(t){t=+t;if(t>=60){var m=Math.floor(t/60),s=Math.round(t-m*60);if(s===60){m++;s=0;}return m+':'+(s<10?'0':'')+s+' น.';}return t.toFixed(1)+' วิ';}
+  var gg='';GM.forEach(function(g){gg+='<a href="../'+g[0]+'/" style="--c:'+g[2]+'"'+(g[0]===cur?' aria-current="page"':'')+'><img src="../icons/'+g[0]+'.png" alt="">'+g[1]+'</a>';});
+  var BODY='<div class="gm-who gmWho"></div><div class="gmStats"></div><div class="gm-card"><div class="gm-h">เล่นเกมอื่น</div><div class="gm-games">'+gg+'</div></div><div class="gm-links"><a class="pri" href="../">หน้าแรก</a><a href="../#ranking">ตารางอันดับ</a><a href="../profile/">โปรไฟล์ของฉัน</a></div>';
+  var box=document.createElement('div');box.id='gmenu';box.hidden=true;
+  box.innerHTML='<div class="gm-box" role="dialog" aria-modal="true" aria-label="เมนู"><div class="gm-top"><span class="gm-h" style="margin:0">เมนู</span><button type="button" class="gm-x" id="gmX" aria-label="ปิดเมนู">✕</button></div>'+BODY+'</div>';
+  document.body.appendChild(box);
+  var opener=null;
+  function closeM(){box.hidden=true;if(opener&&opener.focus)try{opener.focus();}catch(e){}}
+  function openM(){opener=document.activeElement;box.hidden=false;paint(box);box.querySelector('#gmX').focus();}
+  window.__gmenuOpen=openM;
+  box.querySelector('#gmX').onclick=closeM;
+  box.addEventListener('mousedown',function(e){if(e.target===box)closeM();});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!box.hidden&&!document.getElementById('gleave'))closeM();});
+  el.addEventListener('click',function(e){if(e.target.closest('#gmBtn'))openM();});
+  var tok=0,U=null;
+  function paint(root){
+    var who=root.querySelector('.gmWho'),st=root.querySelector('.gmStats'),my=++tok;
+    if(!U){
+      who.innerHTML='ยังไม่ได้เข้าสู่ระบบ<small>เล่นได้ แต่ผลจะไม่ติดอันดับ</small>';
+      st.innerHTML='<div class="gm-card"><div class="gm-h">สถิติของฉัน</div><p class="gm-note" style="margin:0 0 10px">เข้าสู่ระบบเพื่อเก็บสถิติและติดอันดับ</p><div class="gm-links"><a class="pri" href="../#login">เข้าสู่ระบบ</a></div></div>';
+      return;
+    }
+    who.innerHTML='สวัสดี <a href="../profile/">'+esc(U.username)+'</a><small>แตะชื่อเพื่อดูสถิติทั้งหมด</small>';
+    st.innerHTML='<div class="gm-card"><div class="gm-h">สถิติของฉัน</div><p class="gm-note" style="margin:0">กำลังโหลด…</p></div>';
+    Promise.all([Arcade.userRows(U.username),Arcade.overall()]).then(function(r){
+      if(my!==tok||!U)return;
+      var rows=r[0],ov=r[1].filter(function(x){return x.plays>0;}).sort(function(a,b){return b.points-a.points||b.wins-a.wins||(a.username<b.username?-1:1);});
+      var i=ov.findIndex(function(x){return x.username===U.username;}),me=ov[i]||{points:0,wins:0,plays:0};
+      var line='อันดับรวม '+(i>=0?'#'+(i+1):'–')+' · '+(me.points||0)+' แต้ม';
+      var gname='';GM.forEach(function(g){if(g[0]===cur)gname=g[1];});
+      var h;
+      if(gname){
+        var rs=rows.filter(function(x){return x.game===cur&&x.plays>0;}),w=0,p=0;rs.forEach(function(x){w+=x.wins;p+=x.plays;});
+        h='<div class="gm-card"><div class="gm-h">สถิติของฉัน: '+esc(gname)+'</div>';
+        if(!p)h+='<p class="gm-note" style="margin:0">ยังไม่เคยเล่นเกมนี้ ลองเล่นรอบแรกได้เลย</p>';
+        else{
+          h+='<div class="gm-tiles"><div><b>'+w+'</b><span>ชนะ</span></div><div><b>'+p+'</b><span>เล่น</span></div><div><b>'+Math.round(100*w/p)+'%</b><span>อัตราชนะ</span></div></div><div class="gm-rows">';
+          var lbl=AI[cur]?AIL:LV;
+          ORDER.forEach(function(c){var x=rs.filter(function(y){return y.cat===c;})[0];if(!x)return;
+            var ex=STAT[cur]==='time'&&c!=='online'?(x.best_time!=null?'เร็วสุด '+fmtT(x.best_time):''):STAT[cur]==='score'&&x.best_score!=null?'สูงสุด '+x.best_score:'';
+            h+='<div><span>'+(lbl[c]||c)+'</span><span>ชนะ '+x.wins+'/'+x.plays+(ex?' · '+ex:'')+'</span></div>';});
+          h+='</div>';
+        }
+        h+='<p class="gm-note">'+line+'</p></div>';
+      }else{
+        h='<div class="gm-card"><div class="gm-h">ภาพรวมของฉัน</div><div class="gm-tiles"><div><b>'+(i>=0?'#'+(i+1):'–')+'</b><span>อันดับรวม</span></div><div><b>'+(me.points||0)+'</b><span>แต้ม</span></div><div><b>'+(me.wins||0)+'</b><span>ชนะ</span></div></div></div>';
+      }
+      st.innerHTML=h;
+    },function(){if(my===tok)st.innerHTML='<div class="gm-card"><div class="gm-h">สถิติของฉัน</div><p class="gm-note" style="margin:0">โหลดสถิติไม่ได้ ลองใหม่อีกครั้ง</p></div>';});
+  }
+  Arcade.onChange(function(u){U=u;if(!box.hidden)paint(box);var em=document.querySelector('#bgmOv .gm-embed');if(em&&!document.getElementById('bgmOv').hidden)paint(em);});
+  /* เมนูเว็บในแผงเมนูของเกม (ตอนเล่นเต็มจอที่แถบบนถูกซ่อน) */
+  function embed(){var c=document.querySelector('#bgmOv .bgmC');if(!c||c.querySelector('.gm-embed'))return;
+    var d=document.createElement('div');d.className='gm-embed';d.innerHTML=BODY;c.appendChild(d);paint(d);
+    var ov=document.getElementById('bgmOv');
+    if(window.MutationObserver&&!ov._gmw){ov._gmw=1;new MutationObserver(function(){if(!ov.hidden)paint(d);}).observe(ov,{attributes:true,attributeFilter:['hidden']});}}
+  embed();new MutationObserver(embed).observe(document.body,{childList:true});
+  /* A-Math ฝังตัวควบคุมเสียงไว้ในโมดัลเมนูของตัวเอง: ใส่เมนูเว็บต่อท้ายตรงนั้น */
+  function embedAm(){[].forEach.call(document.querySelectorAll('.bgmCtl'),function(c){if(c.closest('#bgmOv'))return;var p=c.parentNode;if(!p||p.querySelector('.gm-embed'))return;
+    var hr=document.createElement('hr');hr.style.cssText='border:0;border-top:1px solid rgba(128,128,128,.35);margin:14px 0';var d=document.createElement('div');d.className='gm-embed';d.innerHTML=BODY;p.appendChild(hr);p.appendChild(d);paint(d);});}
+  if(cur==='amath'){embedAm();new MutationObserver(embedAm).observe(document.body,{childList:true,subtree:true});}
